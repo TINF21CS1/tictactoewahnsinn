@@ -197,3 +197,42 @@ Die Schritt 1-3 können während des Spiels beliebig oft wiederholt werden.
 
 Dieser Use Case beschreibt die Möglichkeit für Spieler, während eines aktiven Multiplayer-Spiels in Echtzeit zu kommunizieren. Er legt fest, wie Spieler den Chat öffnen, Nachrichten eingeben und senden können, und berücksichtigt dabei die Anforderung an sofortige Nachrichtenübermittlung für eine flüssige und engagierte Spielerfahrung.
 
+---
+
+### UC5
+
+**Use Case: Spielstatistiken anzeigen**
+
+**Use Case ID:** UC5
+
+**Primary Actor:** Spieler
+
+**Stakeholders and Interests:**
+- **Spieler:** Interessiert an einer detaillierten Ansicht der eigenen und gegnerischen Leistungen, einschließlich Spielhistorie, Sieg/Niederlage-Verhältnis und anderer relevanter Statistiken, um Fortschritte zu verfolgen und Bereiche für Verbesserungen zu identifizieren.
+
+**Preconditions:** 
+Der Spieler hat mindestens ein Spiel in einem beliebigen Spiel abgeschlossen, und ist entweder in einem Spielmodus oder auf dem Statistik-Menü.
+
+**Success Guarantee (Postconditions):** Die Spieler können eine vollständige Übersicht über ihre Spielstatistiken abrufen, einschließlich der gespielten Spiele, des Sieg/Niederlage-Verhältnisses und der Unterscheidung zwischen eigenen und gegnerischen Leistungen.
+
+**Main Success Scenario:**
+1. Der Spieler wählt im Menü die Option, seine Spielstatistiken anzusehen.
+2. Das System sammelt und bereitet die Statistiken des Spielers auf, einschließlich:
+   - Gesamtanzahl der gespielten Spiele
+   - Sieg-Niederlagen-Verhältnis
+   - Anzahl der Spiele gegen KI vs. andere Spieler
+3. Das System zeigt die Statistiken auf einer dedizierten Seite an, einschließlich Sieg und Niederlageverlauf
+
+---
+
+1. Der Spieler startet einen beliebigen Spielmodus
+2. Das System sammelt und bereitet die Statistiken des Spielers auf, einschließlich:
+   - Gesamtanzahl der gespielten Spiele
+   - Sieg-Niederlagen-Verhältnis
+   - Anzahl der Spiele gegen KI vs. andere Spieler
+3. Das System zeigt die Statistiken an der linken Seite des Spieles an
+
+**Special Requirements:**
+- Die Benutzeroberfläche für die Anzeige der Statistiken muss intuitiv und leicht navigierbar sein, um eine positive Benutzererfahrung zu gewährleisten.
+- Die Datenaktualisierung muss nach einem gespielten Spiel erfolgen.
+- Die eigene Statistik und die Gegnerstatistik müssen im Spiel vergleichbar sein
