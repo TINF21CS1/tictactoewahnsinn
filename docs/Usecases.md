@@ -1,3 +1,80 @@
+**Use Case Template: Profilmanagement**
+
+**Use Case ID:** UC1
+**Use Case Name:** Profilmanagement
+**Primary Actor:** Spieler  
+
+**Stakeholders and Interests:**
+- **Spieler:** Möchte ein Profil haben, um seine Spielerdaten zu verwalten.
+
+**Preconditions:** Der Spieler hat die Anwendung gestartet.
+
+**Success Guarantee (Postconditions):** Das Spielerprofil wurde erfolgreich erstellt, aktualisiert oder gelöscht.
+
+**Main Success Scenario:**
+1. Beim ersten Start der Anwendung wird ein Spielername abgefragt.
+2. Der Spieler füllt die erforderlichen Felder aus.
+3. Das System validiert die eingegebenen Informationen.
+4. Das Spielerprofil wird erfolgreich erstellt und im System gespeichert.
+5. Der Spieler wählt die Option, sein Profil einzusehen.
+6. Das System zeigt dem Spieler alle relevanten Profilinformationen an.
+7. Der Spieler wählt die Option, sein Profil zu aktualisieren.
+8. Der Spieler ändert die gewünschten Informationen und speichert die Änderungen ab.
+9. Das System validiert die aktualisierten Informationen.
+10. Das Spielerprofil wird erfolgreich aktualisiert und im System gespeichert.
+11. Der Spieler wählt die Option, sein Profil zu löschen.
+12. Das System bestätigt die Löschung und löscht das Spielerprofil.
+13. Alle damit verbundenen Daten und Statistiken werden ebenfalls gelöscht.
+14. Der Spieler wird aufgefordert, einen neuen Spielernamen zu wählen.
+
+Extensions (or Alternative flows):
+*2/8. Wenn während des Erstellens oder Aktualisierens des Profils ungültige Informationen eingegeben werden:
+	a. Das System zeigt eine Fehlermeldung an und fordert den Spieler auf, die Informationen zu korrigieren.
+	b. Der Spieler korrigiert die Informationen gemäß den Anweisungen des Systems.
+	c. Die Schritte für das Erstellen oder Aktualisieren des Profils werden fortgesetzt.
+
+*11. Wenn der Spieler entscheidet, das Programm zu beenden, nachdem er das Profil gelöscht hat  aber noch keinen neuen Spielernamen gewählt hat:
+	a. Das System startet so, als ob nie ein Profil vorhanden war und erwartet einen    Spielernamen vor dem Start der Anwendung.
+
+
+
+
+**Use Case Template: Spiel Gegen KI**
+
+**Use Case ID:** UC 2
+**Use Case Name:** Spiel gegen KI 
+**Primary Actor:** Spieler  
+
+**Stakeholders and Interests:**
+- **Spieler:** Möchte die Fähigkeiten gegen eine KI testen und sich selbst herausfordern, indem er unterschiedliche Schwierigkeitsgrade auswählt.
+
+**Preconditions:** Der Spieler hat die Anwendung gestartet.
+
+**Success Guarantee (Postconditions):** Der Spieler spielt ein Spiel gegen die KI.
+
+**Main Success Scenario:**
+1. Der Spieler wählt die Option, ein neues Spiel zu beginnen.
+2. Der Spieler entscheidet sich für ein Spiel gegen die KI.
+3. Der Spieler wählt den gewünschten Schwierigkeitsgrad der KI aus. 
+4. Das System initialisiert ein neues Spielbrett.
+5. Münzwurf, wer das Spiel beginnt – der Spieler oder die KI.
+6. Das Spiel beginnt, und der gewählte Akteur macht den ersten Zug.
+7. Der andere Akteur übernimmt den nächsten Spielzug. Dieser Schritt wird maximal 7 mal wiederholt.
+8. Das Ergebnis wird ausgewertet.
+9. Das Ergebnis des Spieles wird angezeigt.
+10. Statistiken werden aktualisiert. 
+11. Das Board wird beendet. 
+
+Extensions (or Alternative flows):
+*a. Jederzeit, wenn der Abbruch Button betätigt wird:
+	1. Spiel wird als verloren gewertet.
+	2. Statistiken werden aktualisiert. 
+	3. Das Board wird beendet. 
+
+**Technology and Data Variations List:**
+- Die KI-Logik variiert je nach gewähltem Schwierigkeitsgrad, von einfachen bis hin zu komplexen, strategischen Entscheidungen.
+
+
 **Use Case: Play Network Game**
 
 **Use Case ID:** UC3
