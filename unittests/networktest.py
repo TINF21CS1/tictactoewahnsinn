@@ -1,6 +1,7 @@
-import json, sys, time, socket, pytest
+import json, sys, time, socket, pytest, os
 from unittest.mock import patch, MagicMock
-sys.path.append('../TICTACTOEWAHNSINN')
+sys.path.append("..")
+sys.path.append("../tictactoewahnsinn")
 from networking import Network
 
 @pytest.fixture

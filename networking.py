@@ -52,7 +52,7 @@ class Network:
                 self.broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
                 self.broadcast_socket.bind(('', self.port))
                 self.broadcast_socket.settimeout(self.discover_timeout)
-                logging.info(f"[Socket-Broadcast] Broadcast Socket erstellt.")
+                logging.info("[Socket-Broadcast] Broadcast Socket erstellt.")
                 return self.broadcast_socket
 
             except Exception as e:
@@ -238,7 +238,7 @@ class Network:
         try:
             with self.init_peer_connection(addr) as conn:
                 logging.info(f"[Peer-Verbindung] Verbindung mit {addr[0]}:{addr[1]} erfolgreich")
-                self.handle_connection()
+                self.handle_connection(conn)
                 return True
         except socket.error as e:
             logging.error(f"[Peer-Verbindung] Verbindung mit {addr[0]}:{addr[1]} fehlgeschlagen. Error: {e}")
@@ -323,6 +323,6 @@ class Network:
                 logging.error(f"[recv-data] Error: {e}")
                 return None
 
-    def handle_connection():
+    def handle_connection(connection: socket.socket):
         """Placeholder function for handling game logic"""
         pass
