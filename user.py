@@ -33,16 +33,7 @@ class Player():
     def __str__(self):
         return f"{self._name} {self._id} {self._wins} {self._draws} {self._losses}"
 
-    def _updateStatistics(self, status: str): 
-        match status:
-            case "win":
-                self._wins+=1
-            case "draw":
-                self._draws+=1
-            case "loss":
-                self._losses+=1
-        self._save_data()
-
+    
     
 
         
@@ -72,6 +63,17 @@ class User(Player):
 
     def delete_profile(self):
         os.remove("user_data.json")
+
+    def _updateStatistics(self, status: str): 
+        match status:
+            case "win":
+                self._wins+=1
+            case "draw":
+                self._draws+=1
+            case "loss":
+                self._losses+=1
+        self._save_data()
+
 
 class Opponent(Player):
     pass
