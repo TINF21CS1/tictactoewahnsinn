@@ -16,7 +16,7 @@ class Player():
         pass
 
     @abstractmethod
-    def update_statitics(self):
+    def update_statistics(self):
         pass
 
     def get_id(self):
@@ -75,6 +75,9 @@ class User(Player):
         self._save_data()
 
     def join(self):
+        pass
+
+    def leave(self):
         pass
 
 class Opponent(Player):
