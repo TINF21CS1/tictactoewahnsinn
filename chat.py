@@ -27,7 +27,7 @@ class Chat:
                 logging.info(f"[Receive-Data] Player: {id} received message {message}")
                 return message
             
-            except Exception as e:
+            except Exception:
                 logging.error(f"[Receive-Data] Fehler beim Empfangen von Chat-Nachricht: Player: {id}")
                 return "Fehler"
 
@@ -52,5 +52,5 @@ class Chat:
 
             return 0
 
-        except Exception as e:
+        except Exception:
             logging.error(f"[Send-Data] Allgemeiner Fehler beim Senden von Chat-Nachrichten von Player: {self.id}")

@@ -1,4 +1,4 @@
-import json, sys, time, socket, pytest, os
+import json, sys, time, socket, pytest
 from unittest.mock import patch, MagicMock
 sys.path.append("..")
 sys.path.append("../tictactoewahnsinn")
