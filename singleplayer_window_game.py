@@ -12,7 +12,7 @@ class Window():
     def __init__(self):
 
         self.window = Tk()
-        self.window.title('Tic-Tac-Toe - Multiplayer Game')
+        self.window.title('Tic-Tac-Toe - Singleplayer')
 
         # Bildschirmgröße
         screen_width = self.window.winfo_screenwidth()
@@ -36,28 +36,22 @@ class Window():
 
         # Board-Objekt
         self.board_canvas = Canvas(self.window, width=board_size, height=board_size)
-        self.board_canvas.grid(row=0, column=1, sticky=N, pady=20)
-
-        # Chat-Objekt
-        self.chat_canvas = Canvas(self.window, width=board_size/2, height=board_size, bg='lightgray')
-        self.chat_canvas.grid(row=0, column=2, sticky=N+E, padx=20, pady=20)
+        self.board_canvas.grid(row=0, column=2, pady=20, padx=250)
 
         # Zellen konfigurieren
         self.window.grid_rowconfigure(0, weight=1)
         self.window.grid_rowconfigure(1, weight=1)
         self.window.grid_columnconfigure(0, weight=1)
         self.window.grid_columnconfigure(1, weight=1)
-        self.window.grid_columnconfigure(2, weight=1)
 
         # Mindestgröße des Fensters festlegen
         self.window.update_idletasks()
-        min_width = self.stats_canvas.winfo_reqwidth() + self.board_canvas.winfo_reqwidth() + self.chat_canvas.winfo_reqwidth() + 40  # 20 Pixel Platz auf beiden Seiten
+        min_width = self.stats_canvas.winfo_reqwidth() + self.board_canvas.winfo_reqwidth() + self.leave_canvas.winfo_reqwidth() + 40  # 20 Pixel Platz auf beiden Seiten
         min_height = self.stats_canvas.winfo_reqheight() + self.leave_canvas.winfo_reqheight() + 20  # 10 Pixel Platz oben und unten
         self.window.minsize(min_width, min_height)
 
         # Rendern der Objekte:
         self.initialize_board()
-        self.initialize_chat("Chat:")
         self.initialize_stats("Stats:")
         self.initialize_leave("Leave")
 
@@ -81,10 +75,6 @@ class Window():
     def initialize_leave(self, message):
         # Zeichne eine Nachricht im Chat-Objekt
         self.leave_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
-
-    def initialize_chat(self, message):
-        # Zeichne eine Nachricht im Chat-Objekt
-        self.chat_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
 
     def initialize_stats(self, message):
         # Zeichne eine Nachricht im Stats-Objekt
