@@ -5,6 +5,7 @@ import numpy as np
 board_size = 600
 
 class Window():
+    
     def __init__(self):
 
         self.window = Tk()
@@ -46,7 +47,6 @@ class Window():
         self.window.grid_columnconfigure(2, weight=1)
 
         # Mindestgröße des Fensters festlegen
-        # Mindestgröße des Fensters festlegen
         self.window.update_idletasks()
         min_width = (
             self.games_canvas.winfo_reqwidth() +
@@ -61,7 +61,6 @@ class Window():
         )
         self.window.minsize(min_width, min_height)
 
-        # Rendern der Objekte:
         # Rendern der Objekte:
         self.initialize_stats("Open Lobbys:")
         self.initialize_leave("Leave")
@@ -86,7 +85,6 @@ class Window():
     def initialize_create_game(self, message):
         # Zeichne eine Nachricht im Create-Game-Objekt
         self.create_game_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
-
 
 game_instance = Window()
 game_instance.mainloop()
