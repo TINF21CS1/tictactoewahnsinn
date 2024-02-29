@@ -24,7 +24,7 @@ class Window():
 
         # Fenstergröße und Position
         self.window.geometry(f'{board_size}x{board_size}+{x_position}+{y_position}')
-        self.window.state('zoomed') # Start als volles Fenster
+        # self.window.state('zoomed') # Start als volles Fenster
 
         # Statistik-Objekt
         self.stats_canvas = Canvas(self.window, width=board_size/2, height=board_size, bg='lightgray')
