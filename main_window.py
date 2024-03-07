@@ -1,5 +1,5 @@
 from tkinter import *
-import numpy as np
+from tkinter import ttk
 
 # Global Settings
 board_size = 600
@@ -27,19 +27,32 @@ class Window():
         self.stats_canvas.grid(row=0, column=0, sticky=N+W, padx=20, pady=20)
 
         # Quit-Objekt
-        self.quit_canvas = Canvas(self.window, width=200, height=50, bg='lightgray')
-        self.quit_canvas.grid(row=3, column=0, sticky=W+S, padx=20, pady=20)
+        self.quit_canvas = Button(self.window, text="Quit", command=self.window.quit, width=10, height=2, bg='lightgray')
+        self.quit_canvas.grid(row=3, column=0, sticky=S+W, padx=20, pady=20)
 
         # Singleplayer-Objekt
-        self.singleplayer_canvas = Canvas(self.window, width=400, height=75, bg='lightgray')
+        self.singleplayer_canvas = Frame(self.window, width=50, height=7, bg='lightgray')
         self.singleplayer_canvas.grid(row=1, column=1, sticky=N)
 
+        # Singleplayer-Label in Singleplayer
+        Label(self.singleplayer_canvas, text="Singleplayer: ", bg='lightgray', width=20, height=3).grid(row=0, column=0, padx=5, pady=5)
+
+        # Schwierigkeitsgrad für KI
+        self.difficulty = ["leicht", "schwer"]
+        self.Combo = ttk.Combobox(self.singleplayer_canvas, values = self.difficulty, state="readonly")
+        self.Combo.set("Schwierigkeitsgrad")
+        self.Combo.grid(padx = 5, pady = 5)
+
+        # Create-Objekt
+        self.create = Button(self.singleplayer_canvas, text="Create", command=self.singleplayer, width=10, height=3, bg='lightgray')
+        self.create.grid(row=0, column=2, sticky=E, padx=20, pady=20)
+
         # Settings-Objekt
-        self.settings_canvas = Canvas(self.window, width=200, height=50, bg='lightgray')
+        self.settings_canvas = Button(self.window, text="Settings", command=self.settings, width=20, height=3, bg='lightgray')
         self.settings_canvas.grid(row=0, column=2, sticky=N+E, padx=20, pady=20)
 
         # Multiplayer-Objekt
-        self.multiplayer_canvas = Canvas(self.window, width=400, height=75, bg='lightgray')
+        self.multiplayer_canvas = Button(self.window, text="Multiplayer", command=self.multiplayer, width=50, height=7, bg='lightgray')
         self.multiplayer_canvas.grid(row=2, column=1, sticky=N)
 
         # Version-Objekt
@@ -73,35 +86,24 @@ class Window():
         self.window.minsize(min_width, min_height) 
 
         # Rendern der Objekte:
-        self.initialize_settings("Settings")
         self.initialize_stats("Stats:")
-        self.initialize_singleplayer("Singleplayer-Game")
-        self.initialize_multiplayer("Multiplayer-Game")
-        self.initialize_quit("Quit")
         self.initialize_version("Version: 0.1")
 
     def mainloop(self):
         self.window.mainloop()
 
-    def initialize_settings(self, message):
-        # Zeichne eine Nachricht im Settings-Objekt
-        self.settings_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
+    def settings(self):
+        pass
 
     def initialize_stats(self, message):
         # Zeichne eine Nachricht im Stats-Objekt
         self.stats_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
 
-    def initialize_singleplayer(self, message):
-        # Zeichne eine Nachricht im Singleplayer-Objekt
-        self.singleplayer_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
+    def singleplayer(self):
+        pass
 
-    def initialize_multiplayer(self, message):
-        # Zeichne eine Nachricht im Multiplayer-Objekt
-        self.multiplayer_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
-
-    def initialize_quit(self, message):
-        # Zeichne eine Nachricht im Quit-Objekt
-        self.quit_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
+    def multiplayer(self):
+        pass
 
     def initialize_version(self, message):
         # Zeichne eine Nachricht im Version-Objekt

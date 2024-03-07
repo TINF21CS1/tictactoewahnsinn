@@ -31,18 +31,23 @@ class Window():
         self.stats_canvas.grid(row=0, column=0, sticky=N+W, padx=20, pady=20)
 
         # Leave-Objekt
-        self.leave_canvas = Canvas(self.window, width=100, height=50, bg='lightgray')
+        self.leave_canvas = Button(self.window, text="Leave", command=self.window.quit, width=10, height=2, bg='lightgray')
         self.leave_canvas.grid(row=1, column=0, sticky=S+W, padx=20, pady=20)
 
         # Board-Objekt
         self.board_canvas = Canvas(self.window, width=board_size, height=board_size)
-        self.board_canvas.grid(row=0, column=2, pady=20, padx=250)
+        self.board_canvas.grid(row=0, column=1, padx=250, pady=20)
+
+        # Version-Objekt
+        self.version_canvas = Canvas(self.window, width=200, height=50, bg='lightgray')
+        self.version_canvas.grid(row=1, column=2, sticky=E+S, padx=20, pady=20)
 
         # Zellen konfigurieren
         self.window.grid_rowconfigure(0, weight=1)
         self.window.grid_rowconfigure(1, weight=1)
         self.window.grid_columnconfigure(0, weight=1)
         self.window.grid_columnconfigure(1, weight=1)
+        self.window.grid_columnconfigure(2, weight=1)
 
         # Mindestgröße des Fensters festlegen
         self.window.update_idletasks()
@@ -53,7 +58,7 @@ class Window():
         # Rendern der Objekte:
         self.initialize_board()
         self.initialize_stats("Stats:")
-        self.initialize_leave("Leave")
+        self.initialize_version("Version: 0.1")
 
         self.window.bind('<Button-1>', self.click)
 
@@ -72,13 +77,13 @@ class Window():
         for i in range(2):
             self.board_canvas.create_line(0, (i + 1) * board_size / 3, board_size, (i + 1) * board_size / 3)
 
-    def initialize_leave(self, message):
-        # Zeichne eine Nachricht im Chat-Objekt
-        self.leave_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
-
     def initialize_stats(self, message):
         # Zeichne eine Nachricht im Stats-Objekt
         self.stats_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
+
+    def initialize_version(self, message):
+        # Zeichne eine Nachricht im Version-Objekt
+        self.version_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
 
     def draw_O(self, logical_position):
         logical_position = np.array(logical_position) # Zellwert auf dem Board
