@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+import json
 
 # Global Settings
 board_size = 600
@@ -89,25 +90,52 @@ class Window():
         self.initialize_stats("Stats:")
         self.initialize_version("Version: 0.1")
 
+        self.stats()
+
     def mainloop(self):
         self.window.mainloop()
-
-    def settings(self):
-        pass
 
     def initialize_stats(self, message):
         # Zeichne eine Nachricht im Stats-Objekt
         self.stats_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
+
+    def initialize_version(self, message):
+        # Zeichne eine Nachricht im Version-Objekt
+        self.version_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
+
+    # Functions for stats
+    
+    def stats(self):
+        # Stats-Box
+        self.stats_frame = Frame(self.stats_canvas, bg='powderblue')
+        self.stats_frame.pack(side='top', fill="both", padx=3, pady=40)
+
+        self.stats_list = Listbox(self.stats_frame, font=('arial 10 bold italic'), height=5, width=40)
+        self.stats_list.pack(side=TOP, fill=BOTH)
+
+        with open("own_stats_example.json","r") as f:
+            data = json.load(f)
+        
+        # Own stats
+        if len(data) != 0: # Prevent rendering empty data
+            self.stats_list.insert(END, " Eigene Statistiken (" + data["name"] + "): \n")
+
+            self.stats_list.insert(END, " - Siege: " + data["wins"] + "\n")
+            self.stats_list.insert(END, " - Unentschieden: " + data["draws"] + "\n")
+            self.stats_list.insert(END, " - Niederlage: " + data["losses"] + "\n")
+            self.stats_list.insert(END, "")
+        else:
+            self.stats_list.insert(END, " Fehler beim Laden der eigenen Statistiken")
+            self.stats_list.insert(END, "")
+
+    def settings(self):
+        pass
 
     def singleplayer(self):
         pass
 
     def multiplayer(self):
         pass
-
-    def initialize_version(self, message):
-        # Zeichne eine Nachricht im Version-Objekt
-        self.version_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
 
 game_instance = Window()
 game_instance.mainloop()
