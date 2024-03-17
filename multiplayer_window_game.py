@@ -43,6 +43,10 @@ class Window():
         self.chat_canvas = Canvas(self.window, width=board_size/2, height=board_size, bg='lightgray')
         self.chat_canvas.grid(row=0, column=2, sticky=N+E, padx=20, pady=20)
 
+        # Zug-Objekt
+        self.zug_canvas = Canvas(self.window, width=300, height=50, bg='lightgray')
+        self.zug_canvas.grid(row=1, column=1, sticky=S, pady=50)
+
         # Version-Objekt
         self.version_canvas = Canvas(self.window, width=200, height=50, bg='lightgray')
         self.version_canvas.grid(row=1, column=2, sticky=E+S, padx=20, pady=20)
@@ -60,26 +64,28 @@ class Window():
         min_height = self.stats_canvas.winfo_reqheight() + self.leave_canvas.winfo_reqheight() + 20  # 10 Pixel Platz oben und unten
         self.window.minsize(min_width, min_height)
 
-        # Rendern der Objekte:
-        self.initialize_board()
-        self.initialize_chat("Chat:")
-        self.initialize_stats("Stats:")
-        self.initialize_version("Version: 0.1")
-        
-        self.chat()
-        self.stats()
-
-        self.window.bind('<Button-1>', self.click)
-
-        # Starteinstellungen
-        self.board_status = np.zeros(shape=(3, 3))
-
         if player_X == "True": # Zur Festlegung, ob X oder O
             self.player_X = True
         elif player_X == "False":
             self.player_X = False
         else:   # Nur zum Testen!!!
             self.player_X = True
+
+        # Rendern der Objekte:
+        self.initialize_board()
+        self.initialize_chat("Chat:")
+        self.initialize_stats("Stats:")
+        self.initialize_version("Version: 0.1")
+        self.initialize_zug("Aktuell am Zug: ")
+        
+        self.chat()
+        self.stats()
+        self.zug()
+
+        self.window.bind('<Button-1>', self.click)
+
+        # Starteinstellungen
+        self.board_status = np.zeros(shape=(3, 3))
 
     def mainloop(self):
         self.window.mainloop()
@@ -94,6 +100,10 @@ class Window():
     def initialize_chat(self, message):
         # Zeichne eine Nachricht im Chat-Objekt
         self.chat_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
+
+    def initialize_zug(self, message):
+        # Zeichne eine Nachricht im Stats-Objekt
+        self.zug_canvas.create_text(10, 20, anchor='nw', font="cmr 12", fill="black", text=message)
 
     def initialize_stats(self, message):
         # Zeichne eine Nachricht im Stats-Objekt
@@ -116,8 +126,7 @@ class Window():
     def send(self, window=NONE):
         msg = self.my_msg.get()
         if len(msg) != 0: # Prevent sending of zero-fields
-            msg = ' me: ' + msg + '\n'
-            self.msg_list.insert(END, msg)
+            self.msg_list.insert(END, " me: " + msg + "\n")
             self.my_msg.set("")  # Clears input field
 
             #network.send(bytes(msg, "utf8")) #TODO: Chat senden
@@ -130,7 +139,7 @@ class Window():
         self.scrollbar.pack(side=RIGHT, fill=Y)
         
         # Message-History
-        self.msg_list = Listbox(self.messages_frame, font=('arial 10 bold italic'), height=27, width=50, yscrollcommand=self.scrollbar.set)
+        self.msg_list = Listbox(self.messages_frame, font=('arial 10 bold italic'), height=22, width=50, yscrollcommand=self.scrollbar.set)
         self.msg_list.pack(side=LEFT, fill=BOTH)
 
         # Sending messages
@@ -145,6 +154,29 @@ class Window():
         # Additional send-button
         self.send_button = Button(self.send_messages, text="Send", command=self.send, width=8)
         self.send_button.pack(side=RIGHT, padx=20, pady=20)
+
+    # Functions for Zug
+
+    def zug(self):
+        # Stats-Box
+        self.zug_frame = Frame(self.zug_canvas, bg='powderblue')
+        self.zug_frame.pack(side='right', fill="both", padx=200, pady=20)
+
+        self.zug_list = Listbox(self.zug_frame, font=('arial 10 bold italic'), height=1, width=25)
+        self.zug_list.pack(side=RIGHT, fill=BOTH)
+
+        with open("own_stats_example.json","r") as f:
+            
+            data_own = json.load(f)
+
+        with open("enemy_stats_example.json","r") as g:
+            data_enemy = json.load(g)
+        
+        # Only for initialization
+        if self.player_X:
+            self.zug_list.insert(END, data_own["name"] + " (Ich) ")
+        else:
+            self.zug_list.insert(END, data_enemy["name"] + " (Gegner) ")
 
     # Functions for stats
     
@@ -233,6 +265,21 @@ class Window():
                 print("Player O: " + str(self.board_status))
                 # Überprüfen, ob Game gewonnen (Gamemanager, board_status)
                 print("Sende Board an X...") # Senden: Board
+
+        # Zug
+        with open("own_stats_example.json","r") as f:
+
+            data_own = json.load(f)
+
+        with open("enemy_stats_example.json","r") as g:
+            data_enemy = json.load(g)
+        
+        if self.player_X:
+            self.zug_list.delete(0,END)  # Clears Listbox
+            self.zug_list.insert(END, data_own["name"] + " (Ich) ")
+        else:
+            self.zug_list.delete(0,END)  # Clears Listbox
+            self.zug_list.insert(END, data_enemy["name"] + " (Gegner) ")
 
 game_instance = Window("True")
 game_instance.mainloop()
