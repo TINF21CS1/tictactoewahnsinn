@@ -82,7 +82,7 @@ class Window():
         self.stats()
         self.zug()
 
-        self.window.bind('<Button-1>', self.click)
+        self.board_canvas.bind('<Button-1>', self.click)
 
         # Starteinstellungen
         self.board_status = np.zeros(shape=(3, 3))
