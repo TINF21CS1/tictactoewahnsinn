@@ -10,7 +10,7 @@ symbol_X_color = '#FF0000'
 symbol_O_color = '#0000FF'
 
 class Window():
-    def __init__(self):
+    def __init__(self, player_X):
 
         self.window = Tk()
         self.window.title('Tic-Tac-Toe - Multiplayer Game')
@@ -73,8 +73,13 @@ class Window():
 
         # Starteinstellungen
         self.board_status = np.zeros(shape=(3, 3))
-        self.player_X_turns = False
-        self.player_X_starts = False
+
+        if player_X == "True": # Zur Festlegung, ob X oder O
+            self.player_X = True
+        elif player_X == "False":
+            self.player_X = False
+        else:   # Nur zum Testen!!!
+            self.player_X = True
 
     def mainloop(self):
         self.window.mainloop()
@@ -168,7 +173,7 @@ class Window():
 
         with open("enemy_stats_example.json","r") as f:
             data = json.load(f)
-            
+
         # Enemy stats
         if len(data) != 0: # Prevent rendering empty data
             self.stats_list.insert(END, " Eigene Statistiken (" + data["name"] + "): \n")
@@ -211,16 +216,23 @@ class Window():
         grid_position = [event.x, event.y]
         logical_position = self.grid_to_logical(grid_position)
 
-        if self.player_X_turns:
-            if not self.is_grid_occupied(logical_position):
+        if self.player_X and not self.is_grid_occupied(logical_position):
                 self.draw_X(logical_position)
                 self.board_status[logical_position[0]][logical_position[1]] = -1
-                self.player_X_turns = not self.player_X_turns
+                self.player_X = False # Stetigen Wechsel
+
+                print("Player X: " + str(self.board_status))
+                # Überprüfen, ob Game gewonnen (Gamemanager, board_status)
+                print("Sende Board an O...") # Senden: Board
         else:
             if not self.is_grid_occupied(logical_position):
                 self.draw_O(logical_position)
                 self.board_status[logical_position[0]][logical_position[1]] = 1
-                self.player_X_turns = not self.player_X_turns
+                self.player_X = True # Stetigen Wechsel
 
-game_instance = Window()
+                print("Player O: " + str(self.board_status))
+                # Überprüfen, ob Game gewonnen (Gamemanager, board_status)
+                print("Sende Board an X...") # Senden: Board
+
+game_instance = Window("True")
 game_instance.mainloop()
