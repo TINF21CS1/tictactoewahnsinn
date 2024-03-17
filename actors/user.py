@@ -91,11 +91,13 @@ class Opponent(Player):
                 self._losses+=1
 
 
-x = User.from_data()
-print(x)
-x._update_statistics("loss")
-print(x)
-y= Opponent("test")
-print(y)
-y._update_statistics("win")
-print(y)
+if __name__ == "__main__":
+    x = User("Test")
+    print(x)
+    x._update_statistics("loss")
+    print(x)
+    y= Opponent("test")
+    print(y)
+    y._update_statistics("win")
+    print(y)
+
