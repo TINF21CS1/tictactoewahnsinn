@@ -1,7 +1,3 @@
-<<<<<<< HEAD
 __pycache__
-=======
-__pycache__
-board.py
 game_template.py
->>>>>>> feat/ui
+feat/ui
