@@ -64,6 +64,8 @@ class Window():
         self.initialize_chat("Chat:")
         self.initialize_stats("Stats:")
         self.initialize_version("Version: 0.1")
+        
+        self.chat()
 
         self.window.bind('<Button-1>', self.click)
 
@@ -94,6 +96,48 @@ class Window():
         # Zeichne eine Nachricht im Version-Objekt
         self.version_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
 
+    def receive(self):
+        while True:
+            try:
+                #msg = network.recv.decode("utf8") #TODO: Chat empfangen
+                self.msg_list.insert(END, msg)
+            except OSError:  # Possibly client has left the chat.
+                break
+
+    def send(self, window=NONE):
+        msg = self.my_msg.get()
+        if len(msg) != 0: # Prevent sending of zero-fields
+            msg = 'me: ' + msg + '\n'
+            self.msg_list.insert(END, msg)
+            self.my_msg.set("")  # Clears input field
+
+            #network.send(bytes(msg, "utf8")) #TODO: Chat senden
+
+    def chat(self):
+        self.messages_frame = Frame(self.chat_canvas, bg='powderblue')
+        self.messages_frame.pack(side='top', fill="x", padx=2, pady=40)
+
+        self.scrollbar = Scrollbar(self.messages_frame)  # To navigate through past messages
+        self.scrollbar.pack(side=RIGHT, fill=Y)
+        
+        # Message-History
+        self.msg_list = Listbox(self.messages_frame, font=('arial 10 bold italic'), height=27, width=50, yscrollcommand=self.scrollbar.set)
+        self.msg_list.pack(side=LEFT, fill=BOTH)
+
+        # Sending messages
+        self.send_messages = LabelFrame(self.chat_canvas, text=" Send Messages ", bg='powderblue')
+        self.send_messages.pack(side='top', fill="both", padx=2)
+
+        self.my_msg = StringVar()
+        self.entry_field = Entry(self.send_messages, font=('arial 8 italic'), textvariable=self.my_msg, width=25)
+        self.entry_field.bind("<Return>", self.send) #For sending via ENTER
+        self.entry_field.pack(side=LEFT, padx=20, pady=20)
+
+        # Additional send-button
+        self.send_button = Button(self.send_messages, text="Send", command=self.send, width=8)
+        self.send_button.pack(side=RIGHT, padx=20, pady=20)
+
+        
     def draw_O(self, logical_position):
         logical_position = np.array(logical_position) # Zellwert auf dem Board
         grid_position = self.logical_to_grid(logical_position) # Pixelwert in der Zelle
