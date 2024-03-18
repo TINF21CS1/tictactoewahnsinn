@@ -1,5 +1,5 @@
 from tkinter import *
-import numpy as np
+import json
 
 # Global Settings
 board_size = 600
@@ -25,22 +25,26 @@ class Window():
 
         # Aktuelle-Settings-Objekt
         self.current_settings_canvas = Canvas(self.window)
-        self.current_settings_canvas.grid(row=0, column=1, sticky=N, pady=20)
+        self.current_settings_canvas.grid(row=0, column=1, sticky=N+E, pady=20)
 
         # ID-Objekt
         self.id_canvas = Canvas(self.window, width=200, height=50)
-        self.id_canvas.grid(row=1, column=0, sticky=N+W, padx=20)
+        self.id_canvas.grid(row=0, column=0, sticky=N+W, padx=50, pady=150)
 
         # Name-Objekt
         self.name_canvas = Canvas(self.window, width=200, height=50)
-        self.name_canvas.grid(row=2, column=0, sticky=N+W, padx=20)
+        self.name_canvas.grid(row=0, column=0, sticky=N+W, padx=50, pady=250)
 
-        # Hauptmenü-Objekt
-        self.main_menu_canvas = Canvas(self.window, width=200, height=50, bg='lightgray')
-        self.main_menu_canvas.grid(row=4, column=0, sticky=S+W, padx=20, pady=20)
+        # Leave-Objekt
+        self.leave_canvas = Button(self.window, text="Leave", command=self.window.quit, width=10, height=2, bg='lightgray')
+        self.leave_canvas.grid(row=4, column=0, sticky=S+W, padx=20, pady=20)
+
+        # Settings-Objekt
+        self.settings_canvas = Canvas(self.window, width=board_size/2, height=board_size, bg='lightgray')
+        self.settings_canvas.grid(rowspan=3, row=0, column=2, sticky=N+E, padx=20, pady=100)
 
         # Save-Settings-Objekt
-        self.save_settings_canvas = Canvas(self.window, width=200, height=50, bg='lightgray')
+        self.save_settings_canvas = Button(self.window, text="Save Settings", command=self.save_settings, width=13, height=2, bg='lightgray')
         self.save_settings_canvas.grid(row=4, column=2, sticky=S+E, padx=20, pady=20)
 
         # Zellen konfigurieren
@@ -65,7 +69,7 @@ class Window():
             self.current_settings_canvas.winfo_reqheight() +
             self.id_canvas.winfo_reqheight() +
             self.name_canvas.winfo_reqheight() +
-            self.main_menu_canvas.winfo_reqheight() +
+            self.leave_canvas.winfo_reqheight() +
             20  # 10 Pixel Platz oben und unten
         )
         self.window.minsize(min_width, min_height)
@@ -74,11 +78,18 @@ class Window():
         self.initialize_current_settings("Aktuelle Einstellungen:")
         self.initialize_id("ID: ")
         self.initialize_name("Name: ")
-        self.initialize_main_menu("Hauptmenü")
-        self.initialize_save_settings("Save Settings")
+        self.initialize_settings("Einstellungen ändern:")
+
+        self.settings()
+        self.id()
+        self.name()
 
     def mainloop(self):
         self.window.mainloop()
+
+    def initialize_settings(self, message):
+        # Zeichne eine Nachricht im Chat-Objekt
+        self.settings_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
 
     def initialize_current_settings(self, message):
         # Zeichne eine Nachricht im Aktuelle-Settings-Objekt
@@ -92,13 +103,56 @@ class Window():
         # Zeichne eine Nachricht im Name-Objekt
         self.name_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
 
-    def initialize_main_menu(self, message):
-        # Zeichne eine Nachricht im Hauptmenü-Objekt
-        self.main_menu_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
+    def id(self):
+        # ID-Box
+        self.id_frame = Frame(self.id_canvas, bg='powderblue')
+        self.id_frame.pack(side='right', fill="both", padx=200, pady=20)
 
-    def initialize_save_settings(self, message):
-        # Zeichne eine Nachricht im Save-Settings-Objekt
-        self.save_settings_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
+        self.id_list = Listbox(self.id_frame, font=('arial 10 bold italic'), height=1, width=25)
+        self.id_list.pack(side=RIGHT, fill=BOTH)
+
+        with open("settings.json","r") as f:
+            
+            data = json.load(f)
+
+        if data:
+            self.id_list.insert(END, data["id"])
+
+    def name(self):
+        # Name-Box
+        self.name_frame = Frame(self.name_canvas, bg='powderblue')
+        self.name_frame.pack(side='right', fill="both", padx=200, pady=20)
+
+        self.name_list = Listbox(self.name_frame, font=('arial 10 bold italic'), height=1, width=25)
+        self.name_list.pack(side=RIGHT, fill=BOTH)
+
+        with open("settings.json","r") as f:
+            
+            data = json.load(f)
+
+        if data:
+            self.name_list.insert(END, data["name"])
+    
+    def settings(self):
+        # Create a Text widget
+        self.text_frame = Text(self.settings_canvas, width=60, height=27)
+        self.text_frame.pack(side='top', fill='both', padx=3, pady=40)
+
+        with open("settings.json","r") as f:
+            data = json.load(f)
+        
+        # Settings
+        if len(data) != 0: # Prevent rendering empty data
+            self.text_frame.insert(END, data)
+        else:
+            self.text_frame.insert(END, " Fehler beim Laden der Einstellungen")
+            self.text_frame.insert(END, "")
+
+    def save_settings(self):
+        content = self.text_frame.get(1.0, END)
+        content = content.replace("\'", "\"") # For valid json
+        with open("settings.json", "w") as file:
+            file.write(content)
 
 game_instance = Window()
 game_instance.mainloop()

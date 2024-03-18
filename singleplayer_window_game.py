@@ -10,7 +10,7 @@ symbol_X_color = '#FF0000'
 symbol_O_color = '#0000FF'
 
 class Window():
-    def __init__(self, player_X): # self.player_X sollte von Gamemanager festgelegt werden (ein Spieler ist X, der andere O)
+    def __init__(self, player_X, difficulty): # self.player_X sollte von Gamemanager festgelegt werden (ein Spieler ist X, der andere O)
 
         self.window = Tk()
         self.window.title('Tic-Tac-Toe - Singleplayer')
@@ -71,6 +71,12 @@ class Window():
         else:   # Nur zum Testen!!!
             self.player_X = True
 
+        self.board_canvas.bind('<Button-1>', self.click)
+
+        # Starteinstellungen
+        self.board_status = np.zeros(shape=(3, 3))
+        self.difficulty = difficulty
+
         # Rendern der Objekte:
         self.initialize_board()
         self.initialize_diff("Aktueller KI-Schwierigkeitsgrad:")
@@ -81,11 +87,6 @@ class Window():
         self.diff()
         self.stats()
         self.zug()
-
-        self.board_canvas.bind('<Button-1>', self.click)
-
-        # Starteinstellungen
-        self.board_status = np.zeros(shape=(3, 3))
 
     def mainloop(self):
         self.window.mainloop()
@@ -123,10 +124,7 @@ class Window():
         self.diff_list.pack(side=TOP, fill=BOTH)
 
         try:
-            # TODO: Game-Manager nach Schwierigkeitsgrad fragen
-            answer = 0
-            if len(answer) != 0: # Prevent sending of zero-fields
-                self.diff_list.insert(END, " KI: " + answer + "\n")
+                self.diff_list.insert(END, " KI: " + self.difficulty + "\n")
         except:
             self.diff_list.insert(END, " Fehler: Kein Schwierigkeitsgrad verfügbar " + "\n")
 
@@ -241,5 +239,5 @@ class Window():
             self.zug_list.delete(0,END)  # Clears Listbox
             self.zug_list.insert(END, data_enemy["name"] + " (Gegner) ")
 
-game_instance = Window("True")
+game_instance = Window("True", "leicht")
 game_instance.mainloop()

@@ -115,7 +115,7 @@ class Window():
 
     # Functions for chat
 
-    def receive(self):
+    def receive(self, msg):
         while True:
             try:
                 #msg = network.recv.decode("utf8") #TODO: Chat empfangen
