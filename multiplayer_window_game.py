@@ -111,7 +111,7 @@ class Window():
 
     def initialize_version(self, message):
         # Zeichne eine Nachricht im Version-Objekt
-        self.version_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
+        self.version_canvas.create_text(50, 20, anchor='nw', font="cmr 12", fill="black", text=message)
 
     # Functions for chat
 
