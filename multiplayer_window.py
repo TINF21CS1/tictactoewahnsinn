@@ -5,7 +5,7 @@ from tkinter import messagebox
 # Global Settings
 board_size = 600
 
-class Window():
+class L_Window():
     
     def __init__(self):
 

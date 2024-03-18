@@ -4,7 +4,7 @@ import json
 # Global Settings
 board_size = 600
 
-class Window():
+class S_Window():
     
     def __init__(self):
 

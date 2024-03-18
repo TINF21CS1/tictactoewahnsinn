@@ -9,7 +9,7 @@ symbol_thickness = 30
 symbol_X_color = '#FF0000'
 symbol_O_color = '#0000FF'
 
-class Window():
+class MP_Window():
     def __init__(self, player_X):
 
         self.window = Tk()

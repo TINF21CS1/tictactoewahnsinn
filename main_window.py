@@ -5,7 +5,7 @@ import json
 # Global Settings
 board_size = 600
 
-class Window():
+class M_Window():
     def __init__(self):
 
         self.window = Tk()
