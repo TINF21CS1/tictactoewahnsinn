@@ -32,17 +32,17 @@ class Window():
         self.quit_canvas.grid(row=3, column=0, sticky=S+W, padx=20, pady=20)
 
         # Singleplayer-Objekt
-        self.singleplayer_canvas = Frame(self.window, width=50, height=7, bg='lightgray')
+        self.singleplayer_canvas = Canvas(self.window, width=50, height=7, bg='lightgray')
         self.singleplayer_canvas.grid(row=1, column=1, sticky=N)
 
         # Singleplayer-Label in Singleplayer
-        Label(self.singleplayer_canvas, text="Singleplayer: ", bg='lightgray', width=20, height=3).grid(row=0, column=0, padx=5, pady=5)
+        Label(self.singleplayer_canvas, text="Singleplayer (KI): ", bg='lightgray', width=15, height=2).grid(row=0, column=0, sticky=N, padx=5, pady=5)
 
         # Schwierigkeitsgrad für KI
         self.difficulty = ["leicht", "schwer"]
         self.Combo = ttk.Combobox(self.singleplayer_canvas, values = self.difficulty, state="readonly")
-        self.Combo.set("Schwierigkeitsgrad")
-        self.Combo.grid(padx = 5, pady = 5)
+        self.Combo.set(" Schwierigkeitsgrad ")
+        self.Combo.grid(row=0, column=0, sticky=N, padx=15, pady=45)
 
         # Create-Objekt
         self.create = Button(self.singleplayer_canvas, text="Create", command=self.singleplayer, width=10, height=3, bg='lightgray')
@@ -53,7 +53,7 @@ class Window():
         self.settings_canvas.grid(row=0, column=2, sticky=N+E, padx=20, pady=20)
 
         # Multiplayer-Objekt
-        self.multiplayer_canvas = Button(self.window, text="Multiplayer", command=self.multiplayer, width=50, height=7, bg='lightgray')
+        self.multiplayer_canvas = Button(self.window, text="Multiplayer", command=self.multiplayer, width=45, height=7, bg='lightgray')
         self.multiplayer_canvas.grid(row=2, column=1, sticky=N)
 
         # Version-Objekt
@@ -101,7 +101,7 @@ class Window():
 
     def initialize_version(self, message):
         # Zeichne eine Nachricht im Version-Objekt
-        self.version_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
+        self.version_canvas.create_text(50, 20, anchor='nw', font="cmr 12", fill="black", text=message)
 
     # Functions for stats
     
