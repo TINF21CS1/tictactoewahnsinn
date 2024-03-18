@@ -119,5 +119,5 @@ class L_Window():
         # Zeichne eine Nachricht im Version-Objekt
         self.version_canvas.create_text(50, 20, anchor='nw', font="cmr 12", fill="black", text=message)
 
-game_instance = Window()
+game_instance = L_Window()
 game_instance.mainloop()

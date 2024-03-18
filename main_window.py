@@ -137,5 +137,5 @@ class M_Window():
     def multiplayer(self):
         pass
 
-game_instance = Window()
+game_instance = M_Window()
 game_instance.mainloop()

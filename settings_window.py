@@ -154,5 +154,5 @@ class S_Window():
         with open("settings.json", "w") as file:
             file.write(content)
 
-game_instance = Window()
+game_instance = S_Window()
 game_instance.mainloop()

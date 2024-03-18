@@ -239,5 +239,5 @@ class SP_Window():
             self.zug_list.delete(0,END)  # Clears Listbox
             self.zug_list.insert(END, data_enemy["name"] + " (Gegner) ")
 
-game_instance = Window("True", "leicht")
+game_instance = SP_Window("True", "leicht")
 game_instance.mainloop()
