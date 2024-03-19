@@ -39,7 +39,7 @@ class Server:
                     logging.debug(f"[Server-Connect] Successfully connected: {sid}")
                     self.connected_clients.append(sid)
                 else:
-                    await self.sio.emit(self.NETWORK_WARNING, f"[Server-Connect] Disconnected due to exceeded connections", to=sid)
+                    await self.sio.emit(self.NETWORK_WARNING, "[Server-Connect] Disconnected due to exceeded connections", to=sid)
                     await self.sio.disconnect(sid)
 
             except Exception as e:
@@ -82,7 +82,7 @@ class Server:
             """Handle the network packet relay to the other client."""
             try:
                 if 'event_type' not in data or 'data' not in data:
-                    await self.sio.emit(self.NETWORK_WARNING, f"[Server-Packet] Invalid data format", to=sid)
+                    await self.sio.emit(self.NETWORK_WARNING, "[Server-Packet] Invalid data format", to=sid)
                     return
                 
                 logging.info(f"[Net-Packet] Received {data} (from {sid})")
