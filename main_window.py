@@ -1,6 +1,10 @@
 from tkinter import *
 from tkinter import ttk
 import json
+from settings_window import S_Window
+from singleplayer_window_game import SP_Window
+from multiplayer_window import L_Window
+from multiplayer_window_game import MP_Window
 
 # Global Settings
 board_size = 600
@@ -21,7 +25,7 @@ class M_Window():
 
         # Fenstergröße und Position
         self.window.geometry(f'{board_size}x{board_size}+{x_position}+{y_position}')
-        # self.window.state('zoomed') # Start als volles Fenster
+        self.window.state('zoomed') # Start als volles Fenster
 
         # Stats-Objekt
         self.stats_canvas = Canvas(self.window, width=300, height=200, bg='lightgray')
@@ -129,13 +133,13 @@ class M_Window():
             self.stats_list.insert(END, "")
 
     def settings(self):
-        pass
+        extra_window = S_Window()
 
     def singleplayer(self):
-        pass
+        extra_window = SP_Window("True", "leicht")
 
     def multiplayer(self):
-        pass
+        extra_window = L_Window()
 
 game_instance = M_Window()
 game_instance.mainloop()

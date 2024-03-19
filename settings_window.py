@@ -4,61 +4,61 @@ import json
 # Global Settings
 board_size = 600
 
-class S_Window():
+class S_Window(Toplevel):
     
     def __init__(self):
+        super().__init__()
 
-        self.window = Tk()
-        self.window.title('Tic-Tac-Toe - Settings')
+        self.title('Tic-Tac-Toe - Settings')
 
         # Bildschirmgröße
-        screen_width = self.window.winfo_screenwidth()
-        screen_height = self.window.winfo_screenheight()
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
 
         # Position für die Zentrierung des Fensters
         x_position = (screen_width - board_size) // 2
         y_position = (screen_height - board_size) // 2
 
         # Fenstergröße und Position
-        self.window.geometry(f'{board_size}x{board_size}+{x_position}+{y_position}')
-        # self.window.state('zoomed') # Start als volles Fenster
+        self.geometry(f'{board_size}x{board_size}+{x_position}+{y_position}')
+        self.state('zoomed') # Start als volles Fenster
 
         # Aktuelle-Settings-Objekt
-        self.current_settings_canvas = Canvas(self.window)
+        self.current_settings_canvas = Canvas(self)
         self.current_settings_canvas.grid(row=0, column=1, sticky=N+E, pady=20)
 
         # ID-Objekt
-        self.id_canvas = Canvas(self.window, width=200, height=50)
+        self.id_canvas = Canvas(self, width=200, height=50)
         self.id_canvas.grid(row=0, column=0, sticky=N+W, padx=50, pady=150)
 
         # Name-Objekt
-        self.name_canvas = Canvas(self.window, width=200, height=50)
+        self.name_canvas = Canvas(self, width=200, height=50)
         self.name_canvas.grid(row=0, column=0, sticky=N+W, padx=50, pady=250)
 
         # Leave-Objekt
-        self.leave_canvas = Button(self.window, text="Leave", command=self.window.quit, width=10, height=2, bg='lightgray')
+        self.leave_canvas = Button(self, text="Leave", command=self.destroy, width=10, height=2, bg='lightgray')
         self.leave_canvas.grid(row=4, column=0, sticky=S+W, padx=20, pady=20)
 
         # Settings-Objekt
-        self.settings_canvas = Canvas(self.window, width=board_size/2, height=board_size, bg='lightgray')
+        self.settings_canvas = Canvas(self, width=board_size/2, height=board_size, bg='lightgray')
         self.settings_canvas.grid(rowspan=3, row=0, column=2, sticky=N+E, padx=20, pady=100)
 
         # Save-Settings-Objekt
-        self.save_settings_canvas = Button(self.window, text="Save Settings", command=self.save_settings, width=13, height=2, bg='lightgray')
+        self.save_settings_canvas = Button(self, text="Save Settings", command=self.save_settings, width=13, height=2, bg='lightgray')
         self.save_settings_canvas.grid(row=4, column=2, sticky=S+E, padx=20, pady=20)
 
         # Zellen konfigurieren
-        self.window.grid_rowconfigure(0, weight=1)
-        self.window.grid_rowconfigure(1, weight=1)
-        self.window.grid_rowconfigure(2, weight=1)
-        self.window.grid_rowconfigure(3, weight=1)
-        self.window.grid_rowconfigure(4, weight=1)
-        self.window.grid_columnconfigure(0, weight=1)
-        self.window.grid_columnconfigure(1, weight=1)
-        self.window.grid_columnconfigure(2, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(3, weight=1)
+        self.grid_rowconfigure(4, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(2, weight=1)
 
         # Mindestgröße des Fensters festlegen
-        self.window.update_idletasks()
+        self.update_idletasks()
         min_width = (
             self.current_settings_canvas.winfo_reqwidth() +
             self.id_canvas.winfo_reqwidth() +
@@ -72,7 +72,7 @@ class S_Window():
             self.leave_canvas.winfo_reqheight() +
             20  # 10 Pixel Platz oben und unten
         )
-        self.window.minsize(min_width, min_height)
+        self.minsize(min_width, min_height)
 
         # Rendern der Objekte:
         self.initialize_current_settings("Aktuelle Einstellungen:")
@@ -84,8 +84,8 @@ class S_Window():
         self.id()
         self.name()
 
-    def mainloop(self):
-        self.window.mainloop()
+    #def mainloop(self):
+    #   self.window.mainloop()
 
     def initialize_settings(self, message):
         # Zeichne eine Nachricht im Chat-Objekt
@@ -153,6 +153,3 @@ class S_Window():
         content = content.replace("\'", "\"") # For valid json
         with open("settings.json", "w") as file:
             file.write(content)
-
-game_instance = S_Window()
-game_instance.mainloop()

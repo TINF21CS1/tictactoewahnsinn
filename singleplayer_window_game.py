@@ -10,63 +10,63 @@ symbol_thickness = 30
 symbol_X_color = '#FF0000'
 symbol_O_color = '#0000FF'
 
-class SP_Window():
+class SP_Window(Toplevel):
     def __init__(self, player_X, difficulty): # self.player_X sollte von Gamemanager festgelegt werden (ein Spieler ist X, der andere O)
+        super().__init__()
 
-        self.window = Tk()
-        self.window.title('Tic-Tac-Toe - Singleplayer')
+        self.title('Tic-Tac-Toe - Singleplayer')
 
         # Check for Win, Lose & Tie
         self.gm = gamemanager.manager()
 
         # Bildschirmgröße
-        screen_width = self.window.winfo_screenwidth()
-        screen_height = self.window.winfo_screenheight()
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
 
         # Position für die Zentrierung des Fensters
         x_position = (screen_width - board_size) // 2
         y_position = (screen_height - board_size) // 2
 
         # Fenstergröße und Position
-        self.window.geometry(f'{board_size}x{board_size}+{x_position}+{y_position}')
-        # self.window.state('zoomed') # Start als volles Fenster
+        self.geometry(f'{board_size}x{board_size}+{x_position}+{y_position}')
+        self.state('zoomed') # Start als volles Fenster
 
         # Statistik-Objekt
-        self.stats_canvas = Canvas(self.window, width=board_size/2, height=board_size, bg='lightgray')
+        self.stats_canvas = Canvas(self, width=board_size/2, height=board_size, bg='lightgray')
         self.stats_canvas.grid(row=0, column=0, sticky=N+W, padx=20, pady=20)
 
         # Leave-Objekt
-        self.leave_canvas = Button(self.window, text="Leave", command=self.window.quit, width=10, height=2, bg='lightgray')
+        self.leave_canvas = Button(self, text="Leave", command=self.destroy, width=10, height=2, bg='lightgray')
         self.leave_canvas.grid(row=1, column=0, sticky=S+W, padx=20, pady=20)
 
         # Board-Objekt
-        self.board_canvas = Canvas(self.window, width=board_size, height=board_size)
+        self.board_canvas = Canvas(self, width=board_size, height=board_size)
         self.board_canvas.grid(row=0, column=1, sticky=N, pady=20)
 
         # Difficulty-Objekt
-        self.diff_canvas = Canvas(self.window, width=board_size/2, height=board_size, bg='lightgray')
+        self.diff_canvas = Canvas(self, width=board_size/2, height=board_size, bg='lightgray')
         self.diff_canvas.grid(row=0, column=2, sticky=N+E, padx=20, pady=20)
 
         # Zug-Objekt
-        self.zug_canvas = Canvas(self.window, width=300, height=50, bg='lightgray')
+        self.zug_canvas = Canvas(self, width=300, height=50, bg='lightgray')
         self.zug_canvas.grid(row=1, column=1, sticky=S, pady=50)
 
         # Version-Objekt
-        self.version_canvas = Canvas(self.window, width=200, height=50, bg='lightgray')
+        self.version_canvas = Canvas(self, width=200, height=50, bg='lightgray')
         self.version_canvas.grid(row=1, column=2, sticky=E+S, padx=20, pady=20)
 
         # Zellen konfigurieren
-        self.window.grid_rowconfigure(0, weight=1)
-        self.window.grid_rowconfigure(1, weight=1)
-        self.window.grid_columnconfigure(0, weight=1)
-        self.window.grid_columnconfigure(1, weight=1)
-        self.window.grid_columnconfigure(2, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(2, weight=1)
 
         # Mindestgröße des Fensters festlegen
-        self.window.update_idletasks()
+        self.update_idletasks()
         min_width = self.stats_canvas.winfo_reqwidth() + self.board_canvas.winfo_reqwidth() + self.leave_canvas.winfo_reqwidth() + 40  # 20 Pixel Platz auf beiden Seiten
         min_height = self.stats_canvas.winfo_reqheight() + self.leave_canvas.winfo_reqheight() + 20  # 10 Pixel Platz oben und unten
-        self.window.minsize(min_width, min_height)
+        self.minsize(min_width, min_height)
 
         if player_X == "True": # Zur Festlegung, ob X oder O
             self.player_X = True
@@ -92,8 +92,8 @@ class SP_Window():
         self.stats()
         self.zug()
 
-    def mainloop(self):
-        self.window.mainloop()
+    #def mainloop(self):
+    #    self.window.mainloop()
 
     def initialize_board(self):
         for i in range(2):
@@ -261,6 +261,3 @@ class SP_Window():
             else:
                 self.zug_list.delete(0,END)  # Clears Listbox
                 self.zug_list.insert(END, "KI (Gegner) ")
-
-game_instance = SP_Window("True", "leicht")
-game_instance.mainloop()
