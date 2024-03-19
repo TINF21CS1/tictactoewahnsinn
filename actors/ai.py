@@ -1,54 +1,3 @@
-def check_win(board, player):
-    """
-    Check if the specified player has won the Tic-Tac-Toe game.
-
-    Parameters:
-    - board (list): A 2D list representing the Tic-Tac-Toe board.
-    - player (str): The player to check for a win ('X' or 'O').
-
-    Returns:
-    - bool: True if the specified player has won, False otherwise.
-
-    This function checks for a win by the specified player in three directions: rows, columns, and diagonals.
-    If a winning combination is found, the function returns True; otherwise, it returns False.
-
-    Example:
-    Calling check_win(board, 'X') returns True if 'X' has won the game.
-    """
-    # Check rows
-    for row in range(3):
-        if all(board[row, col] == player for col in range(3)):
-            return True
-
-    # Check columns
-    for col in range(3):
-        if all(board[row, col] == player for row in range(3)):
-            return True
-
-    # Check diagonals
-    if all(board[i, i] == player for i in range(3)) or all(board[i, 2 - i] == player for i in range(3)):
-        return True
-
-    return False
-
-def is_draw(board):
-    """
-    Check if the Tic-Tac-Toe game is a draw (no more empty spaces on the board).
-
-    Parameters:
-    - board (list): A 2D list representing the Tic-Tac-Toe board.
-
-    Returns:
-    - bool: True if the game is a draw, False otherwise.
-
-    This function checks if there are no more empty spaces (' ') on the board, indicating a draw.
-
-    Example:
-    Calling is_draw(board) returns True if the game is a draw.
-    """
-    # Check if the game is a draw (no more empty spaces on the board)
-    return all(board[row, col] != ' ' for row in range(3) for col in range(3))
-
 class Player():
     def __init__(self, board):
         self.board = board
@@ -111,11 +60,11 @@ class AI():
         """
 
         # Base case: Check if the game is won by 'X' or 'O' or if it's a draw
-        if check_win(self._board, 'X'):
+        if self._board.check_win('X'):
             return -1                 # 'X' wins, return a negative value
-        elif check_win(self._board, 'O'):
+        elif self._board.check_win('O'):
             return 1                  # 'O' wins, return a positive value
-        elif is_draw(self._board) or depth == self._max_depth:
+        elif self._board.is_draw() or depth == self._max_depth:
             return 0                  # It's a draw or reached the specified depth, return 0
 
         if is_maximizing:
@@ -181,59 +130,4 @@ class AI():
         return best_move
 
 
-def main():
-    """
-    Run the main game loop for a simple Tic-Tac-Toe game.
 
-    The game loop alternates between player and AI turns, displaying the current state of the board after each move.
-    The loop continues until there is a winner ('X' or 'O'), a draw, or the player chooses to exit the game.
-
-    This function uses the display_board, player_move, ai_move, check_win, and is_draw functions to implement the game logic.
-
-    Example:
-    Calling main() starts and runs the Tic-Tac-Toe game until a winner is declared or the game ends in a draw.
-    """
-
-    board = Board()
-    player = Player(board)
-    ai = AI(board, 1)
-    
-    player_turn = True
-
-    while True:
-        board.display_board()
-
-        if player_turn:
-            print("\n")
-            print("Your turn:")
-            row, col = player.player_move()
-            print("\n")
-            board[row, col] = 'X'
-        else:
-            print("\n")
-            input("Press Enter for the Ai player to go...")
-            """
-            Change the depth explored by the AI player by changing the number in
-            parentheses in the next line of code. The default value is 0.
-            """
-            row, col = ai.ai_move()    # TODO: Adjust the depth explored here!
-            print("\n")
-            board[row, col] = 'O'
-
-        if check_win(board, 'X'):
-            board.display_board()
-            print("You win!")
-            break
-        elif check_win(board, 'O'):
-            board.display_board()
-            print("AI wins!")
-            break
-        elif is_draw(board):
-            board.display_board()
-            print("It's a draw!")
-            break
-
-        player_turn = not player_turn
-
-if __name__ == "__main__":
-    main()
