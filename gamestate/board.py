@@ -1,6 +1,6 @@
 class Board:
     def __init__(self):
-        self.state = board = [[' ' for _ in range(3)] for _ in range(3)]
+        self.state =  [[' ' for _ in range(3)] for _ in range(3)]
     
     def display_board(self):
         """
@@ -87,3 +87,6 @@ class Board:
         """
         # Check if the game is a draw (no more empty spaces on the board)
         return all(self[row, col] != ' ' for row in range(3) for col in range(3))
+
+    def clear_board(self):
+        self.state =  [[' ' for _ in range(3)] for _ in range(3)]
