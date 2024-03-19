@@ -1,6 +1,7 @@
 from tkinter import *
 import numpy as np
 import json
+import test_manager as gamemanager
 
 # Global Settings
 board_size = 600
@@ -14,6 +15,9 @@ class MP_Window():
 
         self.window = Tk()
         self.window.title('Tic-Tac-Toe - Multiplayer Game')
+
+        # Check for Win, Lose & Tie
+        self.gm = gamemanager.manager()
 
         # Bildschirmgröße
         screen_width = self.window.winfo_screenwidth()
@@ -243,6 +247,27 @@ class MP_Window():
             return False
         else:
             return True
+        
+    def display_gameover(self, winner):
+
+        with open("own_stats_example.json","r") as f:
+            data = json.load(f)
+
+        with open("enemy_stats_example.json","r") as g:
+            data_enemy = json.load(g)
+
+        if winner == "X":
+            text = f'{data["name"]} gewinnt (X)'
+            color = symbol_X_color
+        elif winner == "O":
+            text = f'{data_enemy["name"]} gewinnt (O)'
+            color = symbol_O_color
+        else:
+            text = 'Unentschieden'
+            color = 'gray'
+
+        self.board_canvas.delete("all")
+        self.board_canvas.create_text(board_size / 2, board_size / 3, font="cmr 30 bold", fill=color, text=text)
 
     def click(self, event):
         grid_position = [event.x, event.y]
@@ -251,35 +276,43 @@ class MP_Window():
         if self.player_X and not self.is_grid_occupied(logical_position):
                 self.draw_X(logical_position)
                 self.board_status[logical_position[0]][logical_position[1]] = -1
+                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie TODO
                 self.player_X = False # Stetigen Wechsel
 
                 print("Player X: " + str(self.board_status))
-                # Überprüfen, ob Game gewonnen (Gamemanager, board_status)
                 print("Sende Board an O...") # Senden: Board
         else:
             if not self.is_grid_occupied(logical_position):
                 self.draw_O(logical_position)
                 self.board_status[logical_position[0]][logical_position[1]] = 1
+                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie TODO
                 self.player_X = True # Stetigen Wechsel
 
                 print("Player O: " + str(self.board_status))
-                # Überprüfen, ob Game gewonnen (Gamemanager, board_status)
                 print("Sende Board an X...") # Senden: Board
+
+        # Check for Win, Lose & Tie
+        if check == "X":
+            self.display_gameover("X")
+        elif check == "O":
+            self.display_gameover("O")
+        elif check == "Tie":
+            self.display_gameover("Tie")
 
         # Zug
         with open("own_stats_example.json","r") as f:
-
             data_own = json.load(f)
 
         with open("enemy_stats_example.json","r") as g:
             data_enemy = json.load(g)
         
-        if self.player_X:
-            self.zug_list.delete(0,END)  # Clears Listbox
-            self.zug_list.insert(END, data_own["name"] + " (Ich) ")
-        else:
-            self.zug_list.delete(0,END)  # Clears Listbox
-            self.zug_list.insert(END, data_enemy["name"] + " (Gegner) ")
+        if not (check == "X" or check == "O" or check == "Tie"):
+            if self.player_X:
+                self.zug_list.delete(0,END)  # Clears Listbox
+                self.zug_list.insert(END, data_own["name"] + " (Ich) ")
+            else:
+                self.zug_list.delete(0,END)  # Clears Listbox
+                self.zug_list.insert(END, data_enemy["name"] + " (Gegner) ")
 
 game_instance = MP_Window("True")
 game_instance.mainloop()
