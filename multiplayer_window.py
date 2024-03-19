@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter.simpledialog import askstring
 from tkinter import messagebox
+from multiplayer_window_game import MP_Window
 
 # Global Settings
 board_size = 600
@@ -107,11 +108,14 @@ class L_Window(Toplevel):
         ip = askstring("Connect to Multiplayer Game", "Enter Game-IP:")
         if ip:
             print(ip)
+
             #Connect to IP
+            extra_window = MP_Window("True")
 
     def create_game(self):
         try:
-            data = network.create_lobby() #TODO
+            #data = network.create_lobby() #TODO
+            extra_window = MP_Window("True")
         except:
             messagebox.showerror('Create Multiplayer Error', 'Fehler: Es konnte keine Lobby erstellt werden')
 
