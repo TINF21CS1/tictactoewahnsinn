@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import font 
 from actors import user
+from actors import ai
 from gamestate import board
 
 class App(tk.Tk):
@@ -95,8 +96,15 @@ class Game(ttk.Frame):
         self.columnconfigure(0, weight=2)
    
          # Add Board to Game page
-        board = Board(self, 1)
-        board.grid(column=0, row=1)
+        board_view = BoardView(self)
+        board_view.grid(column=0, row=1)
+        
+        # MVC for Board
+        model = board.Board() 
+        view = board_view
+        controller = BoardController(model, view)
+        view.set_controller(controller)
+         
 
         # Add Chat to Game page
         chat = Chat(self)
@@ -106,13 +114,15 @@ class Game(ttk.Frame):
         label = ttk.Label(self, text='Player X')
         label.grid(column=0, row=0)
 
-class Board(ttk.Frame):
-    def __init__(self, container, board):
+
+class BoardView(ttk.Frame):
+    def __init__(self, container):
         super().__init__(container)
-        self.board = board
         self._cells = {}
         self.create_grid()
-
+        
+    def set_controller(self, controller):
+        self.controller = controller
 
     def create_grid(self):
         for row in range(3):
@@ -129,6 +139,8 @@ class Board(ttk.Frame):
                     highlightbackground="lightblue",
                 )
                 self._cells[button] = (row, col)
+                button.bind('<ButtonPress-1>', self.pressed)
+
                 button.grid(
                     row=row,
                     column=col,
@@ -137,6 +149,42 @@ class Board(ttk.Frame):
                     sticky="nsew"
                 )
 
+
+
+    def pressed(self, event):
+        clicked_btn = event.widget
+        (row, col) = self._cells[clicked_btn]
+        if self.controller:
+            self.controller.move((row, col))
+            self.controller.ai_move()
+            
+        
+
+class BoardController():
+    def __init__(self, model, view):
+        self.model = model
+        self.view = view
+        self.ai = ai.AI(model, 4)
+
+    def move(self, pos):
+        try:
+            self.model[pos] = 'X'
+            self.model.display_board()
+
+        except ValueError as error:
+            print('error')
+            self.view.show_error(error)
+    
+    def ai_move(self):
+        try:
+            pos = self.ai.ai_move()
+            print(pos)
+            self.model[pos] = 'O'
+            self.model.display_board()
+        except ValueError as error:
+            print('error')
+            self.view.show_error(error)
+  
 class Profile(ttk.Frame):
     def __init__(self, container):
         super().__init__(container)
