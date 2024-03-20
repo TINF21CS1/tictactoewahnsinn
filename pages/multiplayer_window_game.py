@@ -1,7 +1,7 @@
 from tkinter import *
 import numpy as np
 import json
-from . import test_manager as gamemanager
+from .. import Gamemanager as gamemanager
 
 # Global Settings
 board_size = 600
@@ -17,7 +17,7 @@ class MP_Window(Toplevel):
         self.title('Tic-Tac-Toe - Multiplayer Game')
 
         # Check for Win, Lose & Tie
-        self.gm = gamemanager.manager()
+        self.gm = gamemanager.Gamemanager()
 
         # Bildschirmgröße
         screen_width = self.winfo_screenwidth()

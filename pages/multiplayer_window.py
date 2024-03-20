@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter.simpledialog import askstring
 from tkinter import messagebox
 from .multiplayer_window_game import MP_Window
+from .. import Gamemanager as gamemanager
 
 # Global Settings
 board_size = 600
@@ -11,6 +12,9 @@ class L_Window(Toplevel):
     def __init__(self):
         super().__init__()
         self.title('Tic-Tac-Toe - Join/Create Multiplayer Game')
+
+        # Handle connections
+        self.gm = gamemanager.Gamemanager()
 
         # Bildschirmgröße
         screen_width = self.winfo_screenwidth()
