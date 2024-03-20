@@ -5,36 +5,53 @@ import asyncio
 import threading
 import numpy as np
 
+from board import Board
 from sio_server import Server
 from sio_client import Network as Client
 from threading import Thread, Event
 
+
+
 class Gamemanager:
     
     def __init__(self) -> None:
-        pass
+        shutdownevent = threading.Event()
+        self.board = Board()
+        self.connection = None
+        self.coin = None
+        self.move = 1
 
     def coin_flip(self) -> None:
         result = random.randint(0,2**16)
-        connection.send_data("COIN", result)
+        self.connection.send_data("COIN", result)
+        while self.coin == None:
+            pass
+        return self.coin
         
     def determine_starting_player(self,opponent_coin):
         if self.coin > opponent_coin:
-            return True 
+            self.coin = True
         elif self.coin < opponent_coin:
-            return False
+            self.coin = False 
         else:
-            self.coin_flip()
+            result = random.randint(0,2**16)
+            self.connection.send_data("COIN", result)
                  
-    def update_board(self, new_board: list) -> None:
-
-        self.board = new_board
-        self.won = self.game_over()
-        if self.won == 1:
-            print("gewinner einblenden")
-        else:
-            self.player = (self.player + 1) % 2
-            self.turn()
+    def update_board(self, i, j, player) -> None:
+        if self.move == 1:
+            self.board[i,j] = player
+            data ={"var1": i,"var2": j,"var3": player}
+            self.connection.send_data("MOVE",data)
+            self.move = 0
+        while self.move == 0:
+            pass
+        return self.board
+    
+    def opponent_move(self, move):
+        self.board[move["var1"],move["var2"]] = move["var3"]
+        self.move = 1
+             
+          
             
     def checkboard(self, board_status, player):
         if player:
@@ -76,35 +93,27 @@ class Gamemanager:
             tie = True
 
         return tie
-    
-    def aimove(mode) -> list:
-        if mode == "leicht":
-            zug = print("move leicht ki")
-            return zug
-        if mode == "schwer":
-            zug = print("move leicht ki")
-            return zug
 
-    def netzwerk_start():
+    def netzwerk_start(self,game_name):
         # Custom logging format to differentiate between threads
         logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] (%(threadName)s) %(message)s')
 
         # If multiplayer is triggered, start the server and client threads
         # A session name and valid port should be provided
         if True:
-            server_thread = threading.Thread(name="ServerThread", target=lambda: start_multiplayer_server("MyGame", 50000))
-            client_thread = threading.Thread(name="GameThread",target=lambda: asyncio.run(create_multiplayer_game(50000)))
+            server_thread = threading.Thread(name="ServerThread", target=lambda: self.start_multiplayer_server(game_name, 50000))
+            client_thread = threading.Thread(name="GameThread",target=lambda: asyncio.run(self.create_multiplayer_game(50000)))
             threads = [server_thread, client_thread]
             for thread in threads:
                 thread.start()
         
             # Keep the main thread alive until a keyboard interrupt is detected
             try:
-                while not thread_shutdown.is_set():
+                while not self.thread_shutdown.is_set():
                     time.sleep(1)
             except KeyboardInterrupt:
                 logging.info("Stopping Threads . . .")
-                thread_shutdown.set()
+                self.thread_shutdown.set()
             for thread in threads:
                 thread.join()
                 
@@ -112,22 +121,24 @@ class Gamemanager:
         server_instance = Server(session_name=name, session_port=port)
         asyncio.run(server_instance.start_server())
     
-    async def create_multiplayer_game(port):
+    async def create_multiplayer_game(self,port):
         # Wait for the server to start
         await asyncio.sleep(5)
 
         # Create a client connection to the server
-        connection = Client("localhost", port)
+        self.connection = Client("localhost", port)
         
         # Add event listeners to execute when certain events are received
-        connection.event_manager.add_listener(connection.CHAT_TYPE, lambda data: chat_receive(data, connection))
-        connection.event_manager.add_listener(connection.ACK_TYPE, lambda data: print(data))
+        self.connection.event_manager.add_listener(self.connection.CHAT_TYPE, lambda data: self.chat_receive(data, self.connection))
+        self.connection.event_manager.add_listener(self.connection.CHAT_TYPE, lambda data: self.determine_starting_player(data, self.connection))
+        self.connection.event_manager.add_listener(self.connection.CHAT_TYPE, lambda data: self.opponent_move(data, self.connection))
+        self.connection.event_manager.add_listener(self.connection.ACK_TYPE, lambda data: print(data))
 
         # Discover available servers 
-        connection.start_discover()
-        while connection.DISCOVER_ON:
+        self.connection.start_discover()
+        while self.connection.DISCOVER_ON:
             await asyncio.sleep(1)
-        print(connection.potential_servers)
+        print(self.connection.potential_servers)
     
     def chat_receive(data, connection):
         if data == connection.ACK_TYPE:
