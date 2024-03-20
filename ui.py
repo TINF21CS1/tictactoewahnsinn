@@ -19,17 +19,14 @@ class App(tk.Tk):
         
         self.frames = {}
         
-        # self.frames[0] = ProfileCreation(self)
-        # self.frames[1] = Notebook(self)
-        # self.frames[2] = ChooseGamemode(self, self)
 
-        for F in (ProfileCreation, Notebook, ChooseGamemode, Multiplayer, ChooseAiLevel):
+        for F in (ProfileCreation, Notebook):
             frame = F(container, self)
 
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky='nsew')
         
-        self.show_frame(ChooseAiLevel)
+        self.show_frame(Notebook)
 
     def show_frame(self, frame_index):
         frame = self.frames[frame_index]
@@ -38,60 +35,69 @@ class App(tk.Tk):
 class ChooseGamemode(ttk.Frame):
     def __init__(self, container, controller):
         super().__init__(container)
-        self.controller = controller
         multiplayer = ttk.Button(self, text="Multiplayer", command=lambda: controller.show_frame(Multiplayer))
         singleplayer = ttk.Button(self, text="Singleplayer", command=lambda: controller.show_frame(ChooseAiLevel))
+        multiplayer.pack()
+        singleplayer.pack()
               
 class Multiplayer(ttk.Frame):
     def __init__(self, container, controller):
         super().__init__(container)
-        self.controller = controller
-
 
 class ChooseAiLevel(ttk.Frame):
     def __init__(self, container, controller):
         super().__init__(container)
-        self.controller = controller
-
+        easy = ttk.Button(self, text='Easy', command=lambda: controller.show_frame(Game))
+        hard = ttk.Button(self, text='Hard', command=lambda: controller.show_frame(Game))
+        easy.pack()
+        hard.pack()
 
 class Notebook(ttk.Notebook):
     def __init__(self, container, controller):
         super().__init__(container)
-        self.create_board()
 
-    def create_board(self):
-        # Create game page and add to notebook
-        game = Game(self)
-        game.pack(fill='both', expand=True)  
-        self.add(game, text='Game')
+        self.frames = {} 
+               
+        for F in (ChooseGamemode, Multiplayer, ChooseAiLevel, Game):
+            frame = F(self, self)
+
+            self.frames[F] = frame
         
         # Create profile page and add to notebook
         profile = ttk.Frame(self)
         profile.pack(fill='both', expand=True)
+
         self.add(profile, text='Profile')
+        self.show_frame(ChooseGamemode)
 
-        # Add Board to Game page
-        board = Board(game, 1)
-        board.grid(column=0, row=1)
+    def show_frame(self, frame):
+        frame = self.insert(0, self.frames[frame], text='Game')
+        self.select(0)
+        if self.index('end') >= 3:
+            self.hide(1)
 
-        # Add Chat to Game page
-        chat = Chat(game)
-        chat.grid(column=1, row=1)
-
-        # Add Label to Game page
-        label = ttk.Label(game, text='Player X')
-        label.grid(column=0, row=0)
 
 
 class Game(ttk.Frame):
-    def __init__(self, container):
+    def __init__(self, container, controller):
         super().__init__(container)
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=9)
         self.columnconfigure(0, weight=3)
         self.columnconfigure(0, weight=2)
    
-  
+         # Add Board to Game page
+        board = Board(self, 1)
+        board.grid(column=0, row=1)
+
+        # Add Chat to Game page
+        chat = Chat(self)
+        chat.grid(column=1, row=1)
+
+        # Add Label to Game page
+        label = ttk.Label(self, text='Player X')
+        label.grid(column=0, row=0)
+ 
 def callback():
     print("clicked") 
 
@@ -159,37 +165,6 @@ class ProfileCreation(ttk.Frame):
 
 if __name__ == "__main__":
     app = App()
- 
-
-    # # Create Notebook 
-    # notebook = ttk.Notebook(app)
-    # notebook.pack(pady=10, fill='both')
-   
-    # # Create game page and add to notebook
-    # game = Game(notebook)
-    # game.pack(fill='both', expand=True)  
-    # notebook.add(game, text='Game')
-    # 
-    # # Create profile page and add to notebook
-    # profile = ttk.Frame(notebook)
-    # profile.pack(fill='both', expand=True)
-    # notebook.add(profile, text='Profile')
-
-    # # Add Board to Game page
-    # board = Board(game, 1)
-    # board.grid(column=0, row=1)
-
-    # # Add Chat to Game page
-    # chat = Chat(game)
-    # chat.grid(column=1, row=1)
-
-    # # Add Label to Game page
-    # label = ttk.Label(game, text='Player X')
-    # label.grid(column=0, row=0)
-    
-    # Create login
-    # profilecreation = ProfileCreation(app)
-    # profilecreation.pack(pady=10, fill='both')
     app.mainloop()
 
 
