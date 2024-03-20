@@ -11,6 +11,48 @@ class App(tk.Tk):
         self.title('TicTacToe')
         self.geometry('800x600')
         self.resizable(False, False)
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+        self.frames = {}
+        
+        self.frames[0] = ProfileCreation(self)
+        self.frames[1] = Notebook(self)
+        for i in self.frames:
+            self.frames[i].grid(row=0, column=0, sticky="nsew")
+        
+        self.show_frame(1)
+
+    def show_frame(self, frame_index):
+        frame = self.frames[frame_index]
+        frame.tkraise()
+
+class Notebook(ttk.Notebook):
+    def __init__(self, container):
+        super().__init__(container)
+        self.create_board()
+
+    def create_board(self):
+        # Create game page and add to notebook
+        game = Game(self)
+        game.pack(fill='both', expand=True)  
+        self.add(game, text='Game')
+        
+        # Create profile page and add to notebook
+        profile = ttk.Frame(self)
+        profile.pack(fill='both', expand=True)
+        self.add(profile, text='Profile')
+
+        # Add Board to Game page
+        board = Board(game, 1)
+        board.grid(column=0, row=1)
+
+        # Add Chat to Game page
+        chat = Chat(game)
+        chat.grid(column=1, row=1)
+
+        # Add Label to Game page
+        label = ttk.Label(game, text='Player X')
+        label.grid(column=0, row=0)
 
 
 class Game(ttk.Frame):
@@ -20,7 +62,8 @@ class Game(ttk.Frame):
         self.rowconfigure(1, weight=9)
         self.columnconfigure(0, weight=3)
         self.columnconfigure(0, weight=2)
-
+   
+  
 def callback():
     print("clicked") 
 
@@ -64,7 +107,7 @@ class Cell(ttk.Button):
         self.x = x
         self.y = y
 
-class Chat(tk.Frame):
+class Chat(ttk.Frame):
     def __init__(self, container):
         super().__init__(container)
         txt = tk.Text(self , width=60)
@@ -73,7 +116,7 @@ class Chat(tk.Frame):
 def create_profile():
     print("button pressed") 
 
-class ProfileCreation(tk.Frame):
+class ProfileCreation(ttk.Frame):
     def __init__(self, container):
         super().__init__(container)
         username_label = ttk.Label(self, text="Username")
@@ -83,6 +126,7 @@ class ProfileCreation(tk.Frame):
         username_entry.pack()
         create_button = ttk.Button(self, text="Create Profile", command=create_profile)
         create_button.pack()
+
 
 
 if __name__ == "__main__":
@@ -116,8 +160,8 @@ if __name__ == "__main__":
     # label.grid(column=0, row=0)
     
     # Create login
-    profilecreation = ProfileCreation(app)
-    profilecreation.pack(pady=10, fill='both')
+    # profilecreation = ProfileCreation(app)
+    # profilecreation.pack(pady=10, fill='both')
     app.mainloop()
 
 
