@@ -1,82 +1,31 @@
-import ki
-import Multiplayer
-import Player
 import random
+import time
+import logging
+import asyncio
+import threading
+import numpy as np
+
+from sio_server import Server
+from sio_client import Network as Client
 from threading import Thread, Event
 
 class Gamemanager:
     
     def __init__(self) -> None:
+        pass
 
-        self.board = self.create_board()
-        self.player = 0
-        self.player_turn = None
-        self.won = None
-        self.multiplayer = None
-        self.privategame = None
-        self.ai_level = None
-        self.shutdown_event = Event()
-        
-    def start_game(self, multiplayer: bool, privategame: bool, ai_level: int)  -> None:
-
-        self.multiplayer = multiplayer
-        self.privategame = privategame
-        self.ai_level = ai_level
-        self.board = self.create_board()
-
-        if self.multiplayer:
-            try:
-                if self.privategame:
-                    multiplayer_thread = Thread(target=Multiplayer.main)
-                    multiplayer_thread.start()
-                    server = Multiplayer.server
-                else:
-                    multiplayer_thread = Thread(target=Multiplayer.main)
-                    multiplayer_thread.start()
-                    server = Multiplayer.server
-            except:
-                print("Es konnte kein Multiplayer sitzung erstellt werden.")
-
-        try:
-            if not server:
-                self.player = 1
-                Multiplayer.receive()
-            else:
-                self.coin_flip()
-        except:
-            print("Es konnte kein Server festgestellt werden")
-        
-
-        try:
-            while True:
-                if self.shutdown_event.is_set():
-                    break
-        except KeyboardInterrupt:
-            self.shutdown_event.set()
-
-        multiplayer_thread.join()
-
-    def create_board(self) -> list:
-
-        board = [None] * 9
-        return board
-    
     def coin_flip(self) -> None:
-
-        result = random.randint(0, 1)
-        self.player_turn = result
-        Multiplayer.send(result)
-        self.turn()
-      
-    def turn(self) -> None:
+        result = random.randint(0,2**16)
+        connection.send_data("COIN", result)
         
-        if self.ai_level > 0 and self.player_turn ==1:
-            ki.spielzug(self.board)
+    def determine_starting_player(self,opponent_coin):
+        if self.coin > opponent_coin:
+            return True 
+        elif self.coin < opponent_coin:
+            return False
         else:
-            print("funktion aufrufen das die Spieler wissen das die dran sind")
-            
-        
-        
+            self.coin_flip()
+                 
     def update_board(self, new_board: list) -> None:
 
         self.board = new_board
@@ -86,59 +35,108 @@ class Gamemanager:
         else:
             self.player = (self.player + 1) % 2
             self.turn()
-  
-
-    def game_over(self) -> bool:
-
-        # Check horizontally
-        for i in range(0, 3, 7):  
-            if self.board[i] is not None and self.board[i] == self.board[i + 1] == self.board[i + 2]:
-                self.result = self.board[i]
-                return True,self.result
-        
-        # Check vertically
-        for i in range(3): 
-            if self.board[i] is not None and self.board[i] == self.board[i + 3] == self.board[i + 6]:
-                self.result = self.board[i]
-                return True,self.result
-        
-        # Check for diagonal
-        if self.board[i] is not None and ((self.board[0] == self.board[4] == self.board[8]) or (self.board[2] == self.board[4] == self.board[6])):  # Check diagonally
-            self.result = self.board[4]
-            return True,self.result
-        
-        # Check for a draw
-        available = [i for i, val in enumerate(self.board) if val is None]
-        if available[0] is None:
-            self.result = "draw"
-            return True,self.result
+            
+    def checkboard(self, board_status, player):
+        if player:
+            player = "X"
         else:
-            return False
-
-    def validate_move(self, spielzug: int, player: bool) -> None:
-
-        if player == self.player_turn:
-            count_diff = 0
-            new_board = self.board
-            new_board[spielzug] = player
-            for i in range(len(self.board)):
-                if self.board[i] != new_board[i]:
-                    if self.board[i] == None:
-                        count_diff += 1
-                    else:
-                        print("Fehler: Ein bereits vergebener Wert wurde überschrieben!")     
-        else:
-            print("Fehler: Spieler ist nicht am Zug!")
+            player = "O"
+        answer = self.is_winner(board_status, player)
+        answer2 = self.is_tie(board_status)
+        if answer:
+            return player
+        elif answer2:
+            return "Tie"
         
-        if count_diff == 1:
-            if self.ai_level == 0:    
-                Multiplayer.send(spielzug)
-            self.update_board(new_board)
-        else:
-            print("Fehler: Fehlerhafter Spielzug. Es wurden zu viele oder keine Werte geändert!")  
+    def is_winner(self, board_status, player):
+
+        player = -1 if player == 'X' else 1
+
+        # Three in a row
+        for i in range(3):
+            if board_status[i][0] == board_status[i][1] == board_status[i][2] == player:
+                return True
+            if board_status[0][i] == board_status[1][i] == board_status[2][i] == player:
+                return True
+
+        # Diagonals
+        if board_status[0][0] == board_status[1][1] == board_status[2][2] == player:
+            return True
+
+        if board_status[0][2] == board_status[1][1] == board_status[2][0] == player:
+            return True
+
+        return False
+
+    def is_tie(self, board_status):
+
+        r, c = np.where(board_status == 0)
+        tie = False
+        if len(r) == 0:
+            tie = True
+
+        return tie
     
-    def reconnect():
-        print("Funktion Netzerk neustarten")
+    def aimove(mode) -> list:
+        if mode == "leicht":
+            zug = print("move leicht ki")
+            return zug
+        if mode == "schwer":
+            zug = print("move leicht ki")
+            return zug
+
+    def netzwerk_start():
+        # Custom logging format to differentiate between threads
+        logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] (%(threadName)s) %(message)s')
+
+        # If multiplayer is triggered, start the server and client threads
+        # A session name and valid port should be provided
+        if True:
+            server_thread = threading.Thread(name="ServerThread", target=lambda: start_multiplayer_server("MyGame", 50000))
+            client_thread = threading.Thread(name="GameThread",target=lambda: asyncio.run(create_multiplayer_game(50000)))
+            threads = [server_thread, client_thread]
+            for thread in threads:
+                thread.start()
+        
+            # Keep the main thread alive until a keyboard interrupt is detected
+            try:
+                while not thread_shutdown.is_set():
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                logging.info("Stopping Threads . . .")
+                thread_shutdown.set()
+            for thread in threads:
+                thread.join()
+                
+    def start_multiplayer_server(name, port):
+        server_instance = Server(session_name=name, session_port=port)
+        asyncio.run(server_instance.start_server())
+    
+    async def create_multiplayer_game(port):
+        # Wait for the server to start
+        await asyncio.sleep(5)
+
+        # Create a client connection to the server
+        connection = Client("localhost", port)
+        
+        # Add event listeners to execute when certain events are received
+        connection.event_manager.add_listener(connection.CHAT_TYPE, lambda data: chat_receive(data, connection))
+        connection.event_manager.add_listener(connection.ACK_TYPE, lambda data: print(data))
+
+        # Discover available servers 
+        connection.start_discover()
+        while connection.DISCOVER_ON:
+            await asyncio.sleep(1)
+        print(connection.potential_servers)
+    
+    def chat_receive(data, connection):
+        if data == connection.ACK_TYPE:
+            print("ACK received")
+        else:
+            print(f"Chat received: {data}")
+        
+        # Sample routine to send an acknowledge message back to the server
+        asyncio.create_task(connection.send_data(connection.ACK_TYPE, data))
     
     def leave():
         print("Spiel verlassen!")
