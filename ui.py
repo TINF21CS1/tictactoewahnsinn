@@ -7,27 +7,55 @@ from tkinter import font
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-
+        
+        container = ttk.Frame(self) 
+        container.pack(side='top', fill='both', expand = True)
+        
         self.title('TicTacToe')
         self.geometry('800x600')
         self.resizable(False, False)
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(0, weight=1)
+        container.rowconfigure(0, weight=1)
+        container.columnconfigure(0, weight=1)
+        
         self.frames = {}
         
-        self.frames[0] = ProfileCreation(self)
-        self.frames[1] = Notebook(self)
-        for i in self.frames:
-            self.frames[i].grid(row=0, column=0, sticky="nsew")
+        # self.frames[0] = ProfileCreation(self)
+        # self.frames[1] = Notebook(self)
+        # self.frames[2] = ChooseGamemode(self, self)
+
+        for F in (ProfileCreation, Notebook, ChooseGamemode, Multiplayer, ChooseAiLevel):
+            frame = F(container, self)
+
+            self.frames[F] = frame
+            frame.grid(row=0, column=0, sticky='nsew')
         
-        self.show_frame(1)
+        self.show_frame(ChooseAiLevel)
 
     def show_frame(self, frame_index):
         frame = self.frames[frame_index]
         frame.tkraise()
 
+class ChooseGamemode(ttk.Frame):
+    def __init__(self, container, controller):
+        super().__init__(container)
+        self.controller = controller
+        multiplayer = ttk.Button(self, text="Multiplayer", command=lambda: controller.show_frame(Multiplayer))
+        singleplayer = ttk.Button(self, text="Singleplayer", command=lambda: controller.show_frame(ChooseAiLevel))
+              
+class Multiplayer(ttk.Frame):
+    def __init__(self, container, controller):
+        super().__init__(container)
+        self.controller = controller
+
+
+class ChooseAiLevel(ttk.Frame):
+    def __init__(self, container, controller):
+        super().__init__(container)
+        self.controller = controller
+
+
 class Notebook(ttk.Notebook):
-    def __init__(self, container):
+    def __init__(self, container, controller):
         super().__init__(container)
         self.create_board()
 
@@ -117,7 +145,7 @@ def create_profile():
     print("button pressed") 
 
 class ProfileCreation(ttk.Frame):
-    def __init__(self, container):
+    def __init__(self, container, controller):
         super().__init__(container)
         username_label = ttk.Label(self, text="Username")
         username_label.pack()
