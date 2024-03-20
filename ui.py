@@ -3,6 +3,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font 
+import user
 
 class App(tk.Tk):
     def __init__(self):
@@ -28,32 +29,38 @@ class App(tk.Tk):
         
         self.show_frame(ProfileCreation)
 
+        model = user.User()
+        view = self.frames[ProfileCreation]
+        controller = Controller(model, view)
+        view.set_controller(controller)
+         
+
     def show_frame(self, frame):
         frame = self.frames[frame]
         frame.tkraise()
 
 class ChooseGamemode(ttk.Frame):
-    def __init__(self, container, controller):
+    def __init__(self, container, frame_switcher):
         super().__init__(container)
-        multiplayer = ttk.Button(self, text="Multiplayer", command=lambda: controller.show_frame(Multiplayer))
-        singleplayer = ttk.Button(self, text="Singleplayer", command=lambda: controller.show_frame(ChooseAiLevel))
+        multiplayer = ttk.Button(self, text="Multiplayer", command=lambda: frame_switcher.show_frame(Multiplayer))
+        singleplayer = ttk.Button(self, text="Singleplayer", command=lambda: frame_switcher.show_frame(ChooseAiLevel))
         multiplayer.pack()
         singleplayer.pack()
               
 class Multiplayer(ttk.Frame):
-    def __init__(self, container, controller):
+    def __init__(self, container, frame_switcher):
         super().__init__(container)
 
 class ChooseAiLevel(ttk.Frame):
-    def __init__(self, container, controller):
+    def __init__(self, container, frame_switcher):
         super().__init__(container)
-        easy = ttk.Button(self, text='Easy', command=lambda: controller.show_frame(Game))
-        hard = ttk.Button(self, text='Hard', command=lambda: controller.show_frame(Game))
+        easy = ttk.Button(self, text='Easy', command=lambda: frame_switcher.show_frame(Game))
+        hard = ttk.Button(self, text='Hard', command=lambda: frame_switcher.show_frame(Game))
         easy.pack()
         hard.pack()
 
 class Notebook(ttk.Notebook):
-    def __init__(self, container, controller):
+    def __init__(self, container, frame_switcher):
         super().__init__(container)
 
         self.frames = {} 
@@ -79,7 +86,7 @@ class Notebook(ttk.Notebook):
 
 
 class Game(ttk.Frame):
-    def __init__(self, container, controller):
+    def __init__(self, container, frame_switcher):
         super().__init__(container)
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=9)
@@ -120,7 +127,7 @@ class Board(ttk.Frame):
                     fg="black",
                     width=3,
                     height=2,
-                    highlightbackground="lightblue",
+                    highlightbackground="lightblue"
                 )
                 self._cells[button] = (row, col)
                 button.grid(
@@ -151,17 +158,58 @@ def create_profile():
     print("button pressed") 
 
 class ProfileCreation(ttk.Frame):
-    def __init__(self, container, controller):
+    def __init__(self, container, frame_switcher):
         super().__init__(container)
         username_label = ttk.Label(self, text="Username")
         username_label.pack()
-        self.username = tk.StringVar()
-        username_entry = ttk.Entry(self, textvariable=self.username)
-        username_entry.pack()
-        create_button = ttk.Button(self, text="Create Profile", command=create_profile)
-        create_button.pack()
+        self.username_var = tk.StringVar()
+        self.username_entry = ttk.Entry(self, textvariable=self.username_var)
+        self.username_entry.pack()
+        save_button = ttk.Button(self, text="Create Profile", command=self.save_button_clicked)
+        save_button.pack()
+        self.controller = None
+        self.message_label = ttk.Label(self, text='', foreground='red')
+        self.message_label.pack()
 
+    def set_controller(self, controller):
+        self.controller = controller
 
+    def save_button_clicked(self):
+        if self.controller:
+            self.controller.save(self.username_var.get())
+
+    def show_error(self, message):
+        self.message_label['text'] = message
+        self.message_label['foreground'] = 'red'
+        self.message_label.after(3000, self.hide_message)
+        self.username_entry['foreground'] = 'red'
+
+    def show_success(self, message):
+        self.message_label['text'] = message
+        self.message_label['foreground'] = 'green'
+        self.message_label.after(3000, self.hide_message)
+
+        self.username_entry['foreground'] = 'black'
+        self.username_var.set('')
+
+    def hide_message(self):
+        self.message_label['text'] = ''
+
+class Controller():
+    def __init__(self, model, view):
+        self.model = model
+        self.view = view
+
+    def save(self, username):
+        try:
+            self.model.change_name(username)
+            self.model.save()
+
+            self.view.show_success(f'The username {username} is saved!')
+
+        except ValueError as error:
+            print('error')
+            self.view.show_error(error)
 
 if __name__ == "__main__":
     app = App()

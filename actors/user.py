@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import os
 
 class Player():
-    def __init__(self, name: str, wins=0, draws=0, losses=0, id=uuid.uuid4()):
+    def __init__(self, name = "", wins=0, draws=0, losses=0, id=uuid.uuid4()):
         self._name = name
         self._id = id 
         self._wins = wins 
@@ -50,13 +50,12 @@ class User(Player):
 
         return cls(name, wins, draws, losses, id)
 
-    def _save_data(self):
+    def save(self):
         with open("user_data.json", "w") as user_data:
             json.dump({"name": self._name, "id": str(self._id), "wins": self._wins, "draws": self._draws, "losses": self._losses}, user_data) 
 
     def change_name(self, name):
         self._name = name
-        self._save_data()
 
     def make_move(self):
         pass
@@ -72,7 +71,7 @@ class User(Player):
                 self._draws+=1
             case "loss":
                 self._losses+=1
-        self._save_data()
+        self.save()
 
     def join(self):
         pass
