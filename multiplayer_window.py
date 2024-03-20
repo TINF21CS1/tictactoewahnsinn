@@ -62,18 +62,7 @@ class L_Window(Toplevel):
 
         # Mindestgröße des Fensters festlegen
         self.update_idletasks()
-        min_width = (
-            self.games_canvas.winfo_reqwidth() +
-            self.leave_canvas.winfo_reqwidth() +
-            self.join_game_canvas.winfo_reqwidth() +
-            self.create_game_canvas.winfo_reqwidth() +
-            80  # 20 Pixel Platz auf beiden Seiten
-        )
-        min_height = max(
-            self.games_canvas.winfo_reqheight() + 20,  # 10 Pixel Platz oben und unten
-            self.leave_canvas.winfo_reqheight() + 20
-        )
-        self.minsize(min_width, min_height)
+        self.minsize(900, 700)
 
         # Rendern der Objekte:
         self.initialize_stats("Open Lobbys:")
@@ -88,7 +77,11 @@ class L_Window(Toplevel):
         # Zeichne eine Nachricht im Stats-Objekt
         self.games_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
 
-    # Functions for lobbys
+    def initialize_version(self, message):
+        # Zeichne eine Nachricht im Version-Objekt
+        self.version_canvas.create_text(50, 20, anchor='nw', font="cmr 12", fill="black", text=message)
+
+    # Function for finding lobby
     
     def lobbys(self):
         self.lobbys_list.delete(0,END) # For update-functionality
@@ -107,6 +100,8 @@ class L_Window(Toplevel):
 
         self.after(500, self.lobbys) # Update every half second
 
+    # Joining a multiplayer-game via description
+
     def join_game(self):
         ip = askstring("Connect to Multiplayer Game", "Enter Game-IP:")
         if ip:
@@ -115,13 +110,11 @@ class L_Window(Toplevel):
             #Connect to IP
             extra_window = MP_Window("False") # Client hat immer O
 
+    # Host game
+
     def create_game(self):
         try:
             #data = network.create_lobby() #TODO
             extra_window = MP_Window("True") # Host hat immer X
         except:
             messagebox.showerror('Create Multiplayer Error', 'Fehler: Es konnte keine Lobby erstellt werden')
-
-    def initialize_version(self, message):
-        # Zeichne eine Nachricht im Version-Objekt
-        self.version_canvas.create_text(50, 20, anchor='nw', font="cmr 12", fill="black", text=message)

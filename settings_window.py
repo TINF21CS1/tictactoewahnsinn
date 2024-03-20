@@ -106,20 +106,7 @@ class S_Window(Toplevel):
 
         # Mindestgröße des Fensters festlegen
         self.update_idletasks()
-        min_width = (
-            self.current_settings_canvas.winfo_reqwidth() +
-            self.id_canvas.winfo_reqwidth() +
-            self.save_settings_canvas.winfo_reqwidth() +
-            80  # 20 Pixel Platz auf beiden Seiten
-        )
-        min_height = (
-            self.current_settings_canvas.winfo_reqheight() +
-            self.id_canvas.winfo_reqheight() +
-            self.name_canvas.winfo_reqheight() +
-            self.leave_canvas.winfo_reqheight() +
-            20  # 10 Pixel Platz oben und unten
-        )
-        self.minsize(min_width, min_height)
+        self.minsize(900, 700)
 
         # Rendern der Objekte:
         self.initialize_current_settings("Aktuelle Einstellungen:")
@@ -157,16 +144,18 @@ class S_Window(Toplevel):
         self.name_canvas.create_text(10, 20, anchor='nw', font="cmr 12", fill="black", text=message)
 
     def initialize_street(self, message):
-        # Zeichne eine Nachricht im Name-Objekt
+        # Zeichne eine Nachricht im Street-Objekt
         self.street_canvas.create_text(10, 20, anchor='nw', font="cmr 12", fill="black", text=message)
 
     def initialize_plz(self, message):
-        # Zeichne eine Nachricht im Name-Objekt
+        # Zeichne eine Nachricht im PLZ-Objekt
         self.plz_canvas.create_text(10, 20, anchor='nw', font="cmr 12", fill="black", text=message)
 
     def initialize_country(self, message):
-        # Zeichne eine Nachricht im Name-Objekt
+        # Zeichne eine Nachricht im Country-Objekt
         self.country_canvas.create_text(10, 20, anchor='nw', font="cmr 12", fill="black", text=message)
+
+    # Generating the entries
 
     def id(self):
         self.id_list.delete(0,END) # For update-functionality
@@ -217,6 +206,8 @@ class S_Window(Toplevel):
 
         if data:
             self.country_list.insert(END, data["country"])
+
+    # Changing the settings
     
     def settings(self):
         # Create a Text widget
@@ -232,6 +223,8 @@ class S_Window(Toplevel):
         else:
             self.text_frame.insert(END, " Fehler beim Laden der Einstellungen")
             self.text_frame.insert(END, "")
+
+    # Save the changed settings
 
     def save_settings(self):
         content = self.text_frame.get(1.0, END)

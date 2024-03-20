@@ -4,7 +4,6 @@ import json
 from settings_window import S_Window
 from singleplayer_window_game import SP_Window
 from multiplayer_window import L_Window
-import time
 
 # Global Settings
 board_size = 600
@@ -82,20 +81,7 @@ class M_Window():
 
         # Mindestgröße des Fensters festlegen
         self.window.update_idletasks()
-        min_width = (
-            self.stats_canvas.winfo_reqwidth() +
-            self.singleplayer_canvas.winfo_reqwidth() +
-            self.settings_canvas.winfo_reqwidth() +
-            80  # 20 Pixel Platz auf beiden Seiten
-        )
-        min_height = (
-            self.stats_canvas.winfo_reqheight() +  
-            self.singleplayer_canvas.winfo_reqheight() + 
-            self.multiplayer_canvas.winfo_reqheight() +
-            self.quit_canvas.winfo_reqheight() +
-            20 # 10 Pixel Platz oben und unten
-        )
-        self.window.minsize(min_width, min_height) 
+        self.window.minsize(900, 700)
 
         # Rendern der Objekte:
         self.initialize_stats("Stats:")
@@ -136,12 +122,14 @@ class M_Window():
 
         self.window.after(1000, self.stats) # Update every Second
 
+    # Rendering the following windows for navigation
+
     def settings(self):
         extra_window = S_Window()
 
     def singleplayer(self):
         diff = self.Combo.get()
-        extra_window = SP_Window("True", diff)
+        extra_window = SP_Window("True", diff) # Singleplayer always starting as X
 
     def multiplayer(self):
         extra_window = L_Window()

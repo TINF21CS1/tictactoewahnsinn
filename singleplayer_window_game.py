@@ -11,7 +11,7 @@ symbol_X_color = '#FF0000'
 symbol_O_color = '#0000FF'
 
 class SP_Window(Toplevel):
-    def __init__(self, player_X, difficulty): # self.player_X sollte von Gamemanager festgelegt werden (ein Spieler ist X, der andere O)
+    def __init__(self, player_X, difficulty):
         super().__init__()
 
         self.title('Tic-Tac-Toe - Singleplayer')
@@ -71,9 +71,7 @@ class SP_Window(Toplevel):
 
         # Mindestgröße des Fensters festlegen
         self.update_idletasks()
-        min_width = self.stats_canvas.winfo_reqwidth() + self.board_canvas.winfo_reqwidth() + self.leave_canvas.winfo_reqwidth() + 40  # 20 Pixel Platz auf beiden Seiten
-        min_height = self.stats_canvas.winfo_reqheight() + self.leave_canvas.winfo_reqheight() + 20  # 10 Pixel Platz oben und unten
-        self.minsize(min_width, min_height)
+        self.minsize(900, 700)
 
         if player_X == "True": # Zur Festlegung, ob X oder O
             self.player_X = True
@@ -125,7 +123,7 @@ class SP_Window(Toplevel):
         # Zeichne eine Nachricht im Version-Objekt
         self.version_canvas.create_text(50, 20, anchor='nw', font="cmr 12", fill="black", text=message)
 
-    # Functions for diff
+    # Function for displaying difficulty
         
     def diff(self):
         self.diff_frame = Frame(self.diff_canvas, bg='powderblue')
@@ -158,7 +156,7 @@ class SP_Window(Toplevel):
         else:
             self.zug_list.insert(END, "KI (Gegner) ")
 
-    # Functions for stats
+    # Function for stats
     
     def stats(self):
         self.stats_list.delete(0,END) # For update-functionality

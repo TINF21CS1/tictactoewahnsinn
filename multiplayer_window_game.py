@@ -71,9 +71,7 @@ class MP_Window(Toplevel):
 
         # Mindestgröße des Fensters festlegen
         self.update_idletasks()
-        min_width = self.stats_canvas.winfo_reqwidth() + self.board_canvas.winfo_reqwidth() + self.chat_canvas.winfo_reqwidth() + 40  # 20 Pixel Platz auf beiden Seiten
-        min_height = self.stats_canvas.winfo_reqheight() + self.leave_canvas.winfo_reqheight() + 20  # 10 Pixel Platz oben und unten
-        self.minsize(min_width, min_height)
+        self.minsize(900, 700)
 
         if player_X == "True": # Zur Festlegung, ob X oder O
             self.player_X = True
@@ -166,7 +164,7 @@ class MP_Window(Toplevel):
         self.send_button = Button(self.send_messages, text="Send", command=self.send, width=8)
         self.send_button.pack(side=RIGHT, padx=20, pady=20)
 
-    # Functions for Zug
+    # Function for Zug
 
     def zug(self):
         # Stats-Box
@@ -189,7 +187,7 @@ class MP_Window(Toplevel):
         else:
             self.zug_list.insert(END, data_enemy["name"] + " (Gegner) ")
 
-    # Functions for stats
+    # Function for stats
     
     def stats(self):
         self.stats_list.delete(0,END) # For update-functionality
