@@ -1,7 +1,7 @@
 from tkinter import *
 import numpy as np
 import json
-from .. import Gamemanager as gamemanager
+import Gamemanager as gamemanager
 
 # Global Settings
 board_size = 600

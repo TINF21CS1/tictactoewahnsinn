@@ -1,8 +1,8 @@
 from tkinter import *
 import numpy as np
 import json
-from .. import Gamemanager as gamemanager
-from .. import ki as ki
+import Gamemanager as gamemanager
+import ki as ki
 
 # Global Settings
 board_size = 600

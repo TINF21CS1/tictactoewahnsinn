@@ -2,7 +2,8 @@ from tkinter import *
 from tkinter.simpledialog import askstring
 from tkinter import messagebox
 from .multiplayer_window_game import MP_Window
-from .. import Gamemanager as gamemanager
+import Gamemanager as gamemanager
+import json
 
 # Global Settings
 board_size = 600
@@ -74,6 +75,8 @@ class L_Window(Toplevel):
 
         self.lobbys()
 
+        self.data = []
+
     #def mainloop(self):
     #    self.window.mainloop()
 
@@ -88,15 +91,16 @@ class L_Window(Toplevel):
     # Function for finding lobby
     
     def lobbys(self):
+        self.lobbys_list.delete(0,END) # For update-functionality
 
         try:
-            data = self.gm.get_lobbys()
+            self.data += self.gm.get_lobbys()
 
-            if len(data) != 0: # Prevent rendering empty data
+            if len(self.data) != 0: # Prevent rendering empty data
                 self.lobbys_list.insert(END, " Offene Lobbys: \n")
-
-                self.lobbys_list.insert(END, " - " + data + "\n")
-                self.lobbys_list.insert(END, "")
+                for i in self.data:
+                    self.lobbys_list.insert(END, " - " + self.data[i] + "\n")
+                    self.lobbys_list.insert(END, "")
         except:
             self.lobbys_list.insert(END, " Keine offenen Lobbys vohanden ")
             self.lobbys_list.insert(END, "")
@@ -118,8 +122,13 @@ class L_Window(Toplevel):
     # Host game
 
     def create_game(self):
+
+        with open("own_stats_example.json","r") as f:
+            
+            data_own = json.load(f)
+
         try:
-            self.gm.create_lobby()
+            self.gm.create_lobby(data_own["name"]) # Create Lobby with own name
             extra_window = MP_Window("True") # Host hat immer X
         except:
             messagebox.showerror('Create Multiplayer Error', 'Fehler: Es konnte keine Lobby erstellt werden')

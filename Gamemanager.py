@@ -5,7 +5,7 @@ import asyncio
 import threading
 import numpy as np
 
-from board import Board
+from gamestate.board import Board
 from sio_server import Server
 from sio_client import Network as Client
 from threading import Thread, Event
@@ -96,15 +96,15 @@ class Gamemanager:
 
         return tie
 
-    def create_lobbyt(self,game_name,port):
+    def create_lobby(self,game_name):
         # Custom logging format to differentiate between threads
         logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] (%(threadName)s) %(message)s')
 
         # If multiplayer is triggered, start the server and client threads
         # A session name and valid port should be provided
         if True:
-            server_thread = threading.Thread(name="ServerThread", target=lambda: self.start_multiplayer_server(game_name, port))
-            client_thread = threading.Thread(name="GameThread",target=lambda: asyncio.run(self.create_multiplayer_game(port)))
+            server_thread = threading.Thread(name="ServerThread", target=lambda: self.start_multiplayer_server(game_name, 50000))
+            client_thread = threading.Thread(name="GameThread",target=lambda: asyncio.run(self.create_multiplayer_game(50000)))
             threads = [server_thread, client_thread]
             for thread in threads:
                 thread.start()
