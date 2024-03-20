@@ -26,10 +26,10 @@ class App(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky='nsew')
         
-        self.show_frame(Notebook)
+        self.show_frame(ProfileCreation)
 
-    def show_frame(self, frame_index):
-        frame = self.frames[frame_index]
+    def show_frame(self, frame):
+        frame = self.frames[frame]
         frame.tkraise()
 
 class ChooseGamemode(ttk.Frame):
