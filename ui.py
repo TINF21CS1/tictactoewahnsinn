@@ -104,9 +104,6 @@ class Game(ttk.Frame):
         # Add Label to Game page
         label = ttk.Label(self, text='Player X')
         label.grid(column=0, row=0)
- 
-def callback():
-    print("clicked") 
 
 class Board(ttk.Frame):
     def __init__(self, container, board):
@@ -167,6 +164,7 @@ class ProfileCreation(ttk.Frame):
         self.username_entry.pack()
         save_button = ttk.Button(self, text="Create Profile", command=self.save_button_clicked)
         save_button.pack()
+        self.frame_switcher = frame_switcher
         self.controller = None
         self.message_label = ttk.Label(self, text='', foreground='red')
         self.message_label.pack()
@@ -206,6 +204,7 @@ class Controller():
             self.model.save()
 
             self.view.show_success(f'The username {username} is saved!')
+            self.view.frame_switcher.show_frame(Notebook)
 
         except ValueError as error:
             print('error')
