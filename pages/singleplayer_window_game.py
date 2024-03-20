@@ -1,7 +1,8 @@
 from tkinter import *
 import numpy as np
 import json
-from . import test_manager as gamemanager
+from .. import Gamemanager as gamemanager
+from .. import ki as ki
 
 # Global Settings
 board_size = 600
@@ -17,7 +18,10 @@ class SP_Window(Toplevel):
         self.title('Tic-Tac-Toe - Singleplayer')
 
         # Check for Win, Lose & Tie
-        self.gm = gamemanager.manager()
+        self.gm = gamemanager.Gamemanager()
+
+        # Spielzug durch AI
+        self.ki = ki.AI(difficulty)
 
         # Bildschirmgröße
         screen_width = self.winfo_screenwidth()
@@ -77,8 +81,6 @@ class SP_Window(Toplevel):
             self.player_X = True
         elif player_X == "False":
             self.player_X = False
-        else:   # Nur zum Testen!!!
-            self.player_X = True
 
         self.board_canvas.bind('<Button-1>', self.click)
 
@@ -222,39 +224,27 @@ class SP_Window(Toplevel):
         self.board_canvas.delete("all")
         self.board_canvas.create_text(board_size / 2, board_size / 3, font="cmr 30 bold", fill=color, text=text)
 
-    def click(self, event):
-        grid_position = [event.x, event.y]
-        logical_position = self.grid_to_logical(grid_position)
+    def ai_move(self):
+        logical_position = self.ki.spielzug(self.board_status)
+        if not self.is_grid_occupied(logical_position):
+            self.draw_O(logical_position)
+            self.board_status[logical_position[0]][logical_position[1]] = 1
+            
+            check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie
+            self.player_X = True # Stetigen Wechsel
 
-        if self.player_X and not self.is_grid_occupied(logical_position):
-                self.draw_X(logical_position)
-                self.board_status[logical_position[0]][logical_position[1]] = -1
-                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie TODO
-                self.player_X = False # Stetigen Wechsel
+            print("Player O: " + str(self.board_status))
+        self.check(check)
 
-                print("Player X: " + str(self.board_status))
-                print("Sende Board an O...") # Senden: Board
-        else:
-            if not self.is_grid_occupied(logical_position):
-                self.draw_O(logical_position)
-                self.board_status[logical_position[0]][logical_position[1]] = 1
-                #aimove = self.gm.ai_move(self.board_status, self.difficulty) # Get next AI-Move TODO: Rendern
-                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie TODO
-                self.player_X = True # Stetigen Wechsel
-
-                print("Player O: " + str(self.board_status))
-                print("Sende Board an X...") # Senden: Board
-        
+    def check(self, check):
         # Check for Win, Lose & Tie
         if check == "X":
             self.display_gameover("X")
-            self.gm.update_stats("X") #wird durch User-Klasse gehandelt TODO
         elif check == "O":
             self.display_gameover("O")
-            self.gm.update_stats("O") #wird durch User-Klasse gehandelt
         elif check == "Tie":
             self.display_gameover("Tie")
-            self.gm.update_stats("Tie") #wird durch User-Klasse gehandelt
+        # Aktualisieren der Stats wird durch User-Klasse gehandelt
             
         # Zug
         with open("own_stats_example.json","r") as f:
@@ -267,3 +257,20 @@ class SP_Window(Toplevel):
             else:
                 self.zug_list.delete(0,END)  # Clears Listbox
                 self.zug_list.insert(END, "KI (Gegner) ")
+    
+    def click(self, event):
+        grid_position = [event.x, event.y]
+        logical_position = self.grid_to_logical(grid_position)
+
+        if self.player_X and not self.is_grid_occupied(logical_position):
+                self.draw_X(logical_position)
+                self.board_status[logical_position[0]][logical_position[1]] = -1
+                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie durch GM
+                self.player_X = False # Stetigen Wechsel
+
+                print("Player X: " + str(self.board_status))
+
+        self.check(check)
+
+        if not (check == "X" or check == "O" or check == "Tie"): # Solange Game nicht beendet
+            self.ai_move()
