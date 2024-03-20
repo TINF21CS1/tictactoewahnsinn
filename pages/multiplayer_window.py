@@ -84,15 +84,14 @@ class L_Window(Toplevel):
     # Function for finding lobby
     
     def lobbys(self):
-        self.lobbys_list.delete(0,END) # For update-functionality
 
         try:
-            data = network.get_lobbys() #TODO
+            data = self.gm.get_lobbys()
 
             if len(data) != 0: # Prevent rendering empty data
                 self.lobbys_list.insert(END, " Offene Lobbys: \n")
 
-                self.lobbys_list.insert(END, " - " + data + "\n") # TODO: Parsen der Antwort
+                self.lobbys_list.insert(END, " - " + data + "\n")
                 self.lobbys_list.insert(END, "")
         except:
             self.lobbys_list.insert(END, " Keine offenen Lobbys vohanden ")
@@ -103,9 +102,11 @@ class L_Window(Toplevel):
     # Joining a multiplayer-game via description
 
     def join_game(self):
-        ip = askstring("Connect to Multiplayer Game", "Enter Game-IP:")
+        ip = askstring("Connect to Multiplayer Game", "Enter Session_Name:Port:")
         if ip:
             print(ip)
+
+            self.gm.connect(ip)
 
             #Connect to IP
             extra_window = MP_Window("False") # Client hat immer O
@@ -114,7 +115,7 @@ class L_Window(Toplevel):
 
     def create_game(self):
         try:
-            #data = network.create_lobby() #TODO
+            self.gm.create_lobby()
             extra_window = MP_Window("True") # Host hat immer X
         except:
             messagebox.showerror('Create Multiplayer Error', 'Fehler: Es konnte keine Lobby erstellt werden')
