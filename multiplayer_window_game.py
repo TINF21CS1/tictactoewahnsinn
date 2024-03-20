@@ -35,6 +35,13 @@ class MP_Window(Toplevel):
         self.stats_canvas = Canvas(self, width=board_size/2, height=board_size, bg='lightgray')
         self.stats_canvas.grid(row=0, column=0, sticky=N+W, padx=20, pady=20)
 
+        # Stats-Box
+        self.stats_frame = Frame(self.stats_canvas, bg='powderblue')
+        self.stats_frame.pack(side='top', fill="both", padx=3, pady=40)
+
+        self.stats_list = Listbox(self.stats_frame, font=('arial 10 bold italic'), height=27, width=50)
+        self.stats_list.pack(side=TOP, fill=BOTH)
+
         # Leave-Objekt
         self.leave_canvas = Button(self, text="Leave", command=self.destroy, width=10, height=2, bg='lightgray')
         self.leave_canvas.grid(row=1, column=0, sticky=S+W, padx=20, pady=20)
@@ -185,12 +192,7 @@ class MP_Window(Toplevel):
     # Functions for stats
     
     def stats(self):
-        # Stats-Box
-        self.stats_frame = Frame(self.stats_canvas, bg='powderblue')
-        self.stats_frame.pack(side='top', fill="both", padx=3, pady=40)
-
-        self.stats_list = Listbox(self.stats_frame, font=('arial 10 bold italic'), height=27, width=50)
-        self.stats_list.pack(side=TOP, fill=BOTH)
+        self.stats_list.delete(0,END) # For update-functionality
 
         with open("own_stats_example.json","r") as f:
             data = json.load(f)
@@ -221,6 +223,8 @@ class MP_Window(Toplevel):
         else:
             self.stats_list.insert(END, " Fehler beim Laden der gegnerischen Statistiken")
             self.stats_list.insert(END, "")
+
+        self.after(500, self.stats) # Update every half second
         
     # Functions for board
         

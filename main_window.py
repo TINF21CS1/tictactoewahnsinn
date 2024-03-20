@@ -4,6 +4,7 @@ import json
 from settings_window import S_Window
 from singleplayer_window_game import SP_Window
 from multiplayer_window import L_Window
+import time
 
 # Global Settings
 board_size = 600
@@ -29,6 +30,13 @@ class M_Window():
         # Stats-Objekt
         self.stats_canvas = Canvas(self.window, width=300, height=200, bg='lightgray')
         self.stats_canvas.grid(row=0, column=0, sticky=N+W, padx=20, pady=20)
+
+        # Stats-Box
+        self.stats_frame = Frame(self.stats_canvas, bg='powderblue')
+        self.stats_frame.pack(side='top', fill="both", padx=3, pady=40)
+
+        self.stats_list = Listbox(self.stats_frame, font=('arial 10 bold italic'), height=5, width=40)
+        self.stats_list.pack(side=TOP, fill=BOTH)
 
         # Quit-Objekt
         self.quit_canvas = Button(self.window, text="Quit", command=self.window.quit, width=10, height=2, bg='lightgray')
@@ -109,12 +117,7 @@ class M_Window():
     # Functions for stats
     
     def stats(self):
-        # Stats-Box
-        self.stats_frame = Frame(self.stats_canvas, bg='powderblue')
-        self.stats_frame.pack(side='top', fill="both", padx=3, pady=40)
-
-        self.stats_list = Listbox(self.stats_frame, font=('arial 10 bold italic'), height=5, width=40)
-        self.stats_list.pack(side=TOP, fill=BOTH)
+        self.stats_list.delete(0,END) # For update-functionality
 
         with open("own_stats_example.json","r") as f:
             data = json.load(f)
@@ -131,11 +134,14 @@ class M_Window():
             self.stats_list.insert(END, " Fehler beim Laden der eigenen Statistiken")
             self.stats_list.insert(END, "")
 
+        self.window.after(1000, self.stats) # Update every Second
+
     def settings(self):
         extra_window = S_Window()
 
     def singleplayer(self):
-        extra_window = SP_Window("True", "leicht")
+        diff = self.Combo.get()
+        extra_window = SP_Window("True", diff)
 
     def multiplayer(self):
         extra_window = L_Window()

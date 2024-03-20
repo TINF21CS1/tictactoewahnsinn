@@ -1,7 +1,1 @@
-{
-    "id": "1234",
-    "name": "Hans",
-    "wins": "2",
-    "draws": "4",
-    "losses": "1"
-}
+{"id": "1234", "name": "Hans", "wins": "10", "draws": "4", "losses": "2"}

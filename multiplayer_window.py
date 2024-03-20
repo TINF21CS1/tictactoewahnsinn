@@ -110,12 +110,12 @@ class L_Window(Toplevel):
             print(ip)
 
             #Connect to IP
-            extra_window = MP_Window("True")
+            extra_window = MP_Window("False") # Client hat immer O
 
     def create_game(self):
         try:
             #data = network.create_lobby() #TODO
-            extra_window = MP_Window("True")
+            extra_window = MP_Window("True") # Host hat immer X
         except:
             messagebox.showerror('Create Multiplayer Error', 'Fehler: Es konnte keine Lobby erstellt werden')
 

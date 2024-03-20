@@ -31,21 +31,56 @@ class S_Window(Toplevel):
         self.id_canvas = Canvas(self, width=175, height=50)
         self.id_canvas.grid(row=0, column=0, sticky=S+W, padx=75, pady=100)
 
+        # ID-Box
+        self.id_frame = Frame(self.id_canvas, width=175, bg='powderblue')
+        self.id_frame.pack(side='right', fill="both", padx=200, pady=20)
+
+        self.id_list = Listbox(self.id_frame, font=('arial 10 bold italic'), height=1, width=25)
+        self.id_list.pack(side=RIGHT, fill=BOTH)
+
         # Name-Objekt
         self.name_canvas = Canvas(self, width=175, height=50)
         self.name_canvas.grid(row=0, column=0, sticky=S+W, padx=75, pady=50)
+
+        # Name-Box
+        self.name_frame = Frame(self.name_canvas, width=175, bg='powderblue')
+        self.name_frame.pack(side='right', fill="both", padx=200, pady=20)
+
+        self.name_list = Listbox(self.name_frame, font=('arial 10 bold italic'), height=1, width=25)
+        self.name_list.pack(side=RIGHT, fill=BOTH)
 
         # Straße-Objekt
         self.street_canvas = Canvas(self, width=175, height=50)
         self.street_canvas.grid(row=0, column=0, sticky=S+W, padx=75)
 
+        # Street-Box
+        self.street_frame = Frame(self.street_canvas, width=175, bg='powderblue')
+        self.street_frame.pack(side='right', fill="both", padx=200, pady=20)
+
+        self.street_list = Listbox(self.street_frame, font=('arial 10 bold italic'), height=1, width=25)
+        self.street_list.pack(side=RIGHT, fill=BOTH)
+
         # PLZ-Objekt
         self.plz_canvas = Canvas(self, width=175, height=50)
         self.plz_canvas.grid(row=1, column=0, sticky=N+W, padx=75)
 
+        # Plz-Box
+        self.plz_frame = Frame(self.plz_canvas, width=175, bg='powderblue')
+        self.plz_frame.pack(side='right', fill="both", padx=200, pady=20)
+
+        self.plz_list = Listbox(self.plz_frame, font=('arial 10 bold italic'), height=1, width=25)
+        self.plz_list.pack(side=RIGHT, fill=BOTH)
+
         # Land-Objekt
         self.country_canvas = Canvas(self, width=175, height=50)
         self.country_canvas.grid(row=1, column=0, sticky=N+W, padx=75, pady=50)
+
+        # Country-Box
+        self.country_frame = Frame(self.country_canvas, width=175, bg='powderblue')
+        self.country_frame.pack(side='right', fill="both", padx=200, pady=20)
+
+        self.country_list = Listbox(self.country_frame, font=('arial 10 bold italic'), height=1, width=25)
+        self.country_list.pack(side=RIGHT, fill=BOTH)
 
         # Leave-Objekt
         self.leave_canvas = Button(self, text="Leave", command=self.destroy, width=10, height=2, bg='lightgray')
@@ -134,12 +169,7 @@ class S_Window(Toplevel):
         self.country_canvas.create_text(10, 20, anchor='nw', font="cmr 12", fill="black", text=message)
 
     def id(self):
-        # ID-Box
-        self.id_frame = Frame(self.id_canvas, width=175, bg='powderblue')
-        self.id_frame.pack(side='right', fill="both", padx=200, pady=20)
-
-        self.id_list = Listbox(self.id_frame, font=('arial 10 bold italic'), height=1, width=25)
-        self.id_list.pack(side=RIGHT, fill=BOTH)
+        self.id_list.delete(0,END) # For update-functionality
 
         with open("settings.json","r") as f:
             
@@ -149,12 +179,7 @@ class S_Window(Toplevel):
             self.id_list.insert(END, data["id"])
 
     def name(self):
-        # Name-Box
-        self.name_frame = Frame(self.name_canvas, width=175, bg='powderblue')
-        self.name_frame.pack(side='right', fill="both", padx=200, pady=20)
-
-        self.name_list = Listbox(self.name_frame, font=('arial 10 bold italic'), height=1, width=25)
-        self.name_list.pack(side=RIGHT, fill=BOTH)
+        self.name_list.delete(0,END) # For update-functionality
 
         with open("settings.json","r") as f:
             
@@ -164,12 +189,7 @@ class S_Window(Toplevel):
             self.name_list.insert(END, data["name"])
 
     def street(self):
-        # Street-Box
-        self.street_frame = Frame(self.street_canvas, width=175, bg='powderblue')
-        self.street_frame.pack(side='right', fill="both", padx=200, pady=20)
-
-        self.street_list = Listbox(self.street_frame, font=('arial 10 bold italic'), height=1, width=25)
-        self.street_list.pack(side=RIGHT, fill=BOTH)
+        self.street_list.delete(0,END) # For update-functionality
 
         with open("settings.json","r") as f:
             
@@ -179,12 +199,7 @@ class S_Window(Toplevel):
             self.street_list.insert(END, data["street"])
 
     def plz(self):
-        # Plz-Box
-        self.plz_frame = Frame(self.plz_canvas, width=175, bg='powderblue')
-        self.plz_frame.pack(side='right', fill="both", padx=200, pady=20)
-
-        self.plz_list = Listbox(self.plz_frame, font=('arial 10 bold italic'), height=1, width=25)
-        self.plz_list.pack(side=RIGHT, fill=BOTH)
+        self.plz_list.delete(0,END) # For update-functionality
 
         with open("settings.json","r") as f:
             
@@ -194,12 +209,7 @@ class S_Window(Toplevel):
             self.plz_list.insert(END, data["plz"])
 
     def country(self):
-        # Country-Box
-        self.country_frame = Frame(self.country_canvas, width=175, bg='powderblue')
-        self.country_frame.pack(side='right', fill="both", padx=200, pady=20)
-
-        self.country_list = Listbox(self.country_frame, font=('arial 10 bold italic'), height=1, width=25)
-        self.country_list.pack(side=RIGHT, fill=BOTH)
+        self.country_list.delete(0,END) # For update-functionality
 
         with open("settings.json","r") as f:
             
@@ -228,3 +238,10 @@ class S_Window(Toplevel):
         content = content.replace("\'", "\"") # For valid json
         with open("settings.json", "w") as file:
             file.write(content)
+        
+        # Update all settings
+        self.id()
+        self.name()
+        self.street()
+        self.plz()
+        self.country()

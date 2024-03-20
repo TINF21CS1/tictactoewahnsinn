@@ -1,6 +1,7 @@
-# Important! Only for testing winning-screen functionality!
+# Important! Only for testing winning-screen & update-settings functionality!
 
 import numpy as np
+import json
 
 class manager():
 
@@ -47,3 +48,24 @@ class manager():
             return player
         elif answer2:
             return "Tie"
+        
+    def update_stats(self, stat):
+
+        with open("own_stats_example.json", "r") as f:
+            data_own = json.load(f)
+
+            if stat == "X":
+                wins = int(data_own["wins"])
+                wins +=1
+                data_own["wins"] = str(wins)
+            elif stat == "O":
+                losses = int(data_own["losses"])
+                losses +=1
+                data_own["losses"] = str(losses)
+            elif stat == "Tie":
+                tie = int(data_own["draws"])
+                tie +=1
+                data_own["draws"] = str(tie)
+
+        with open("own_stats_example.json", "w") as f:
+            f.write(json.dumps(data_own))
