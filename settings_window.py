@@ -28,12 +28,24 @@ class S_Window(Toplevel):
         self.current_settings_canvas.grid(row=0, column=1, sticky=N+E, pady=20)
 
         # ID-Objekt
-        self.id_canvas = Canvas(self, width=200, height=50)
-        self.id_canvas.grid(row=0, column=0, sticky=N+W, padx=50, pady=150)
+        self.id_canvas = Canvas(self, width=175, height=50)
+        self.id_canvas.grid(row=0, column=0, sticky=S+W, padx=75, pady=100)
 
         # Name-Objekt
-        self.name_canvas = Canvas(self, width=200, height=50)
-        self.name_canvas.grid(row=0, column=0, sticky=N+W, padx=50, pady=250)
+        self.name_canvas = Canvas(self, width=175, height=50)
+        self.name_canvas.grid(row=0, column=0, sticky=S+W, padx=75, pady=50)
+
+        # Straße-Objekt
+        self.street_canvas = Canvas(self, width=175, height=50)
+        self.street_canvas.grid(row=0, column=0, sticky=S+W, padx=75)
+
+        # PLZ-Objekt
+        self.plz_canvas = Canvas(self, width=175, height=50)
+        self.plz_canvas.grid(row=1, column=0, sticky=N+W, padx=75)
+
+        # Land-Objekt
+        self.country_canvas = Canvas(self, width=175, height=50)
+        self.country_canvas.grid(row=1, column=0, sticky=N+W, padx=75, pady=50)
 
         # Leave-Objekt
         self.leave_canvas = Button(self, text="Leave", command=self.destroy, width=10, height=2, bg='lightgray')
@@ -78,11 +90,17 @@ class S_Window(Toplevel):
         self.initialize_current_settings("Aktuelle Einstellungen:")
         self.initialize_id("ID: ")
         self.initialize_name("Name: ")
+        self.initialize_street("Strasse: ")
+        self.initialize_plz("PLZ: ")
+        self.initialize_country("Land: ")
         self.initialize_settings("Einstellungen ändern:")
 
         self.settings()
         self.id()
         self.name()
+        self.street()
+        self.plz()
+        self.country()
 
     #def mainloop(self):
     #   self.window.mainloop()
@@ -97,15 +115,27 @@ class S_Window(Toplevel):
 
     def initialize_id(self, message):
         # Zeichne eine Nachricht im ID-Objekt
-        self.id_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
+        self.id_canvas.create_text(10, 20, anchor='nw', font="cmr 12", fill="black", text=message)
 
     def initialize_name(self, message):
         # Zeichne eine Nachricht im Name-Objekt
-        self.name_canvas.create_text(10, 10, anchor='nw', font="cmr 12", fill="black", text=message)
+        self.name_canvas.create_text(10, 20, anchor='nw', font="cmr 12", fill="black", text=message)
+
+    def initialize_street(self, message):
+        # Zeichne eine Nachricht im Name-Objekt
+        self.street_canvas.create_text(10, 20, anchor='nw', font="cmr 12", fill="black", text=message)
+
+    def initialize_plz(self, message):
+        # Zeichne eine Nachricht im Name-Objekt
+        self.plz_canvas.create_text(10, 20, anchor='nw', font="cmr 12", fill="black", text=message)
+
+    def initialize_country(self, message):
+        # Zeichne eine Nachricht im Name-Objekt
+        self.country_canvas.create_text(10, 20, anchor='nw', font="cmr 12", fill="black", text=message)
 
     def id(self):
         # ID-Box
-        self.id_frame = Frame(self.id_canvas, bg='powderblue')
+        self.id_frame = Frame(self.id_canvas, width=175, bg='powderblue')
         self.id_frame.pack(side='right', fill="both", padx=200, pady=20)
 
         self.id_list = Listbox(self.id_frame, font=('arial 10 bold italic'), height=1, width=25)
@@ -120,7 +150,7 @@ class S_Window(Toplevel):
 
     def name(self):
         # Name-Box
-        self.name_frame = Frame(self.name_canvas, bg='powderblue')
+        self.name_frame = Frame(self.name_canvas, width=175, bg='powderblue')
         self.name_frame.pack(side='right', fill="both", padx=200, pady=20)
 
         self.name_list = Listbox(self.name_frame, font=('arial 10 bold italic'), height=1, width=25)
@@ -132,6 +162,51 @@ class S_Window(Toplevel):
 
         if data:
             self.name_list.insert(END, data["name"])
+
+    def street(self):
+        # Street-Box
+        self.street_frame = Frame(self.street_canvas, width=175, bg='powderblue')
+        self.street_frame.pack(side='right', fill="both", padx=200, pady=20)
+
+        self.street_list = Listbox(self.street_frame, font=('arial 10 bold italic'), height=1, width=25)
+        self.street_list.pack(side=RIGHT, fill=BOTH)
+
+        with open("settings.json","r") as f:
+            
+            data = json.load(f)
+
+        if data:
+            self.street_list.insert(END, data["street"])
+
+    def plz(self):
+        # Plz-Box
+        self.plz_frame = Frame(self.plz_canvas, width=175, bg='powderblue')
+        self.plz_frame.pack(side='right', fill="both", padx=200, pady=20)
+
+        self.plz_list = Listbox(self.plz_frame, font=('arial 10 bold italic'), height=1, width=25)
+        self.plz_list.pack(side=RIGHT, fill=BOTH)
+
+        with open("settings.json","r") as f:
+            
+            data = json.load(f)
+
+        if data:
+            self.plz_list.insert(END, data["plz"])
+
+    def country(self):
+        # Country-Box
+        self.country_frame = Frame(self.country_canvas, width=175, bg='powderblue')
+        self.country_frame.pack(side='right', fill="both", padx=200, pady=20)
+
+        self.country_list = Listbox(self.country_frame, font=('arial 10 bold italic'), height=1, width=25)
+        self.country_list.pack(side=RIGHT, fill=BOTH)
+
+        with open("settings.json","r") as f:
+            
+            data = json.load(f)
+
+        if data:
+            self.country_list.insert(END, data["country"])
     
     def settings(self):
         # Create a Text widget

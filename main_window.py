@@ -4,7 +4,6 @@ import json
 from settings_window import S_Window
 from singleplayer_window_game import SP_Window
 from multiplayer_window import L_Window
-from multiplayer_window_game import MP_Window
 
 # Global Settings
 board_size = 600
