@@ -70,41 +70,50 @@ class Chat(tk.Frame):
         txt = tk.Text(self , width=60)
         scrollbar = ttk.Scrollbar(txt)
 
+def create_profile():
+    print("button pressed") 
+
 class ProfileCreation(tk.Frame):
     def __init__(self, container):
         super().__init__(container)
-            
+        username_label = ttk.Label(self, text="Username")
+        username_label.pack()
+        self.username = tk.StringVar()
+        username_entry = ttk.Entry(self, textvariable=self.username)
+        username_entry.pack()
+        create_button = ttk.Button(self, text="Create Profile", command=create_profile)
+        create_button.pack()
 
 
 if __name__ == "__main__":
     app = App()
  
 
-    # Create Notebook 
-    notebook = ttk.Notebook(app)
-    notebook.pack(pady=10, fill='both')
+    # # Create Notebook 
+    # notebook = ttk.Notebook(app)
+    # notebook.pack(pady=10, fill='both')
    
-    # Create game page and add to notebook
-    game = Game(notebook)
-    game.pack(fill='both', expand=True)  
-    notebook.add(game, text='Game')
-    
-    # Create profile page and add to notebook
-    profile = ttk.Frame(notebook)
-    profile.pack(fill='both', expand=True)
-    notebook.add(profile, text='Profile')
+    # # Create game page and add to notebook
+    # game = Game(notebook)
+    # game.pack(fill='both', expand=True)  
+    # notebook.add(game, text='Game')
+    # 
+    # # Create profile page and add to notebook
+    # profile = ttk.Frame(notebook)
+    # profile.pack(fill='both', expand=True)
+    # notebook.add(profile, text='Profile')
 
-    # Add Board to Game page
-    board = Board(game, 1)
-    board.grid(column=0, row=1)
+    # # Add Board to Game page
+    # board = Board(game, 1)
+    # board.grid(column=0, row=1)
 
-    # Add Chat to Game page
-    chat = Chat(game)
-    chat.grid(column=1, row=1)
+    # # Add Chat to Game page
+    # chat = Chat(game)
+    # chat.grid(column=1, row=1)
 
-    # Add Label to Game page
-    label = ttk.Label(game, text='Player X')
-    label.grid(column=0, row=0)
+    # # Add Label to Game page
+    # label = ttk.Label(game, text='Player X')
+    # label.grid(column=0, row=0)
     
     # Create login
     profilecreation = ProfileCreation(app)
