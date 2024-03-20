@@ -1,2 +1,6 @@
 pytest
 pytest-flakes
+socketio
+socketio-python
+uvicorn
+aiohttp
