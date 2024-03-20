@@ -20,8 +20,9 @@ class Gamemanager:
         self.connection = None
         self.coin = None
         self.move = None
+        self.gegenermove = None
 
-    def coin_flip(self) -> None:
+    def coin_flip(self):
         result = random.randint(0,2**16)
         self.connection.send_data(self.connect.COIN_TYPE, result)
         while self.coin == None:
@@ -47,10 +48,11 @@ class Gamemanager:
             self.move = 0
         while self.move == 0:
             pass
-        return self.board
+        return self.gegenermove[1],self.gegenermove[2]
     
     def opponent_move(self, move):
         self.board[move["var1"],move["var2"]] = move["var3"]
+        self.gegenermove = move
         self.move = 1
             
     def checkboard(self, board_status, player):
@@ -147,7 +149,7 @@ class Gamemanager:
     def chat_safe(self, data):
         self.msg = data
         
-    def chat_recive(self, data):
+    def receive(self):
         return self.msg
 
     def leave():
