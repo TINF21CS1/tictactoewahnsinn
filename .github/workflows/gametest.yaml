@@ -23,3 +23,4 @@ jobs:
     - name: Run tests
       run: |
         pytest unittests/gametest.py -v
+        pytest unittests/networktest.py -v
