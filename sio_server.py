@@ -4,8 +4,14 @@ import socketio
 import uvicorn
 import socket
 
+
+
 class Server:
     """A simple server class that handles socket connections and relays messages."""
+
+    BROADCAST_INTERVAL = 10                     # Broadcast interval in seconds
+    BROADCAST_MESSAGE = "[Tictactoe Server]"    # Broadcast message format
+    BROADCAST_PORT = 50020                      # Port for broadcasting server information
 
     NETWORK_INFO = "NET_INFO"           # Event type for network information (e.g. connect/disconnect messages)
     NETWORK_WARNING = "NET_WARNING"     # Event type for network warnings (e.g. exceeded connections)
@@ -13,8 +19,6 @@ class Server:
 
     NETWORK_PACKET = "RELAY"            # Event type for network packet relay (client sending data to other client)
     MAX_CLIENTS = 2                     # Maximum number of clients allowed to connect to the server
-    MIN_PORT = 50000                    # Minimum port number for the server
-    MAX_PORT = 50015                    # Maximum port number for the server
 
 
     def __init__(self, session_name: str, session_port: int):
@@ -25,6 +29,21 @@ class Server:
         self.session_name = session_name
         self.session_port = session_port
         self.connected_clients = []
+
+    
+    async def broadcast_ip(self):
+        """Broadcasts the server's IP address and port using a UDP socket."""
+        message = f"{self.BROADCAST_MESSAGE} {self.session_port}".encode('utf-8')
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) as sock:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            sock.settimeout(0.2)
+            while True:
+                try:
+                    sock.sendto(message, ('<broadcast>', self.BROADCAST_PORT))
+                    logging.debug(f"[Server-Broadcast] Broadcasting server info: {message.decode('utf-8')}")
+                except Exception as e:
+                    logging.error(f"[Server-Broadcast] Error broadcasting server info: {e}")
+                await asyncio.sleep(self.BROADCAST_INTERVAL)
 
     
     def register_event_handlers(self):
@@ -43,9 +62,9 @@ class Server:
                     await self.sio.disconnect(sid)
 
             except Exception as e:
-                logging.error(f"Error handling connect: {e}")
+                logging.error(f"[Server-Connect] Error handling connect: {e}")
 
-
+    
         @self.sio.on('disconnect')
         async def disconnect(sid):
             """Handle a disconnecting SocketIO connection."""
@@ -57,16 +76,16 @@ class Server:
                 self.connected_clients.remove(sid)
 
             except Exception as e:
-                logging.error(f"Error handling disconnect: {e}")
+                logging.error(f"[Server-Disconnect] Error handling disconnect: {e}")
 
-        
+
         @self.sio.on(self.NETWORK_DISCOVER)
-        async def discover(sid):
+        async def discover(sid, data):
             """Handle a network discovery request by a client."""
             await asyncio.sleep(1)
             try:
                 if len(self.connected_clients) < self.MAX_CLIENTS + 1:
-                    await self.sio.emit(self.NETWORK_DISCOVER, {"connectable": True, "player_count": len(self.connected_clients), "session_name": self.session_name, "session_port": self.session_port}, to=sid)
+                    await self.sio.emit(self.NETWORK_DISCOVER, {"connectable": True, "player_count": len(self.connected_clients), "session_name": self.session_name, "session_host": data, "session_port": self.session_port}, to=sid)
                     logging.debug(f"[Server-Discover] Discovered by {sid} (success)")
 
                 else:
@@ -74,7 +93,7 @@ class Server:
                     logging.debug(f"[Server-Discover] Discovered by {sid} (failure)")
 
             except Exception as e:
-                logging.error(f"Error handling disvover: {e}")
+                logging.error(f"[Server-Discover] Error handling disvover: {e}")
 
 
         @self.sio.on(self.NETWORK_PACKET)
@@ -94,30 +113,25 @@ class Server:
                     await self.sio.emit(self.NETWORK_WARNING, "[Server-Packet] No clients available to send", to=sid)
 
             except Exception as e:
-                logging.error(f"Error handling packet relay: {e}")
+                logging.error(f"[Server-Packet] Error handling packet relay: {e}")
                 await self.sio.emit(self.NETWORK_WARNING, "[Server-Packet] Error processing your request", to=sid)
 
 
     async def start_server(self):
         """Start the server and listen for incoming connections."""
-        logging.basicConfig(level=logging.INFO)
-
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             if s.connect_ex(('localhost', self.session_port)) == 0:
                 logging.error(f"[Server-Init] Port {self.session_port} is already in use")
                 return
-
-        if self.session_port < self.MIN_PORT or self.session_port > self.MAX_PORT:
-            logging.error(f"[Server-Init] Port {self.session_port} is out of range")
-            return
         
+        broadcast_task = asyncio.create_task(self.broadcast_ip())
         self.register_event_handlers()
-
-        config = uvicorn.Config(self.app, host="localhost", port=self.session_port, log_level="info")
+        
+        config = uvicorn.Config(self.app, host="0.0.0.0", port=self.session_port, log_level="info")
         server = uvicorn.Server(config)
 
         await server.serve()
-
+        await broadcast_task()
 
 
 

@@ -1,6 +1,8 @@
+import socket
 import asyncio
 import logging
 import socketio
+import threading
 
 from sio_server import Server
 
@@ -17,17 +19,65 @@ class Network:
     SERVER_WARNING = Server.NETWORK_WARNING     # Event type for server warnings (e.g. exceeded connections)
     SERVER_PACKET = Server.NETWORK_PACKET       # Event type for server packet relay (client sending data to other client)
     SERVER_DISCOVER = Server.NETWORK_DISCOVER   # Event type for server discovery (client checking for available servers)
-    SERVER_MIN_PORT = Server.MIN_PORT            # Minimum port number for the server
-    SERVER_MAX_PORT = Server.MAX_PORT            # Maximum port number for the server
 
-    potential_servers = []  # List of potential servers in the configured network
+    BROADCAST_PORT = Server.BROADCAST_PORT    # Port for listening to server broadcasts
+    SERVER_BROADCAST = Server.BROADCAST_MESSAGE # Broadcast message format
+    CLIENT_DISCOVER_TIMEOUT = 20                # Timeout for server discovery
+    CLIENT_DISCOVER_DELAY = 2                   # Delay between server discovery attempts
+    IS_DISCOVERING = False                      # Flag to enable server discovery
+
+    broadcast_servers = []  # List of servers found during discovery
+    potential_servers = []  # List of servers that can be connected to
 
 
-    def __init__(self, server_port):
+    def __init__(self, server_host, server_port):
+        self.server_host = server_host
         self.server_port = server_port
+        self.shutdown_flag = threading.Event()
         self.sio = socketio.AsyncClient()
         self.event_manager = NetworkEventManager()
+        self.loop = asyncio.get_running_loop()
         self.register_event_handlers()
+
+
+    def start_discover(self):
+        """Starts listening for server broadcasts."""
+        self.DISCOVER_ON = True
+        self.loop.create_task(self.discover_servers())
+
+
+    async def discover_servers(self):
+        """Listens for broadcast messages from servers on the local network."""
+        def listen():
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                sock.bind(('', self.BROADCAST_PORT)) 
+                for i in range(self.CLIENT_DISCOVER_TIMEOUT):
+                    sock.settimeout(1.0)
+                    try:
+                        data, addr = sock.recvfrom(1024)
+                        data = data.decode('utf-8')
+                        if data[:18] == self.SERVER_BROADCAST and all(server["host"] != addr[0] for server in self.broadcast_servers):
+                            self.broadcast_servers.append({"host": addr[0], "port": data[len(self.SERVER_BROADCAST) + 1:]})
+                        logging.debug(f"[Net-Discover] Received broadcast from {addr}")
+                    except socket.timeout:
+                        logging.debug(f"[Net-Discover] Listening for broadcasts...")
+                        continue
+        self.listen_thread = threading.Thread(name="GameThread-1) (Broadcast", target=listen, daemon=True)
+        self.listen_thread.start()
+        self.listen_thread.join()    
+        logging.debug("[Net-Discover] Server discovery stopped")
+        logging.debug(f"[Net-Discover] Found {self.broadcast_servers}") 
+
+        for server in self.broadcast_servers:
+            if await self.connect(server["host"], server["port"]):
+                await self.sio.emit(self.SERVER_DISCOVER, server["host"])
+                await asyncio.sleep(self.CLIENT_DISCOVER_DELAY)
+                await self.sio.disconnect()
+            else:
+                logging.error(f"Failed to connect to {server['host']}:{server['port']}")
+
+        self.DISCOVER_ON = False
 
 
     def register_event_handlers(self):
@@ -50,7 +100,8 @@ class Network:
                 try:
                     self.potential_servers.append({
                         "player_count": data["player_count"], 
-                        "session_name": data["session_name"], 
+                        "session_name": data["session_name"],
+                        "session_host": data["session_host"],
                         "session_port": data["session_port"]
                     })
                     logging.info(f"[Net-Discover] Success on {data['session_port']}")
@@ -66,10 +117,12 @@ class Network:
             await self.event_manager.trigger_event(event, data)
 
 
-    async def connect(self):
+    async def connect(self, server_host, server_port):
         """Attempts to connect to the server and returns the success status."""
+        host = server_host if server_host else self.server_host
+        port = server_port if server_port else self.server_port
         try:
-            await self.sio.connect(f'http://localhost:{self.server_port}')
+            await self.sio.connect(f'http://{host}:{port}')
             return True
         except Exception as e:
             logging.error(f'[Net-Connect] Fehler: {e}')
@@ -82,31 +135,6 @@ class Network:
             await self.sio.emit(self.SERVER_PACKET, {"event_type": event, "data": data})
         except Exception as e:
             logging.error(f'[Net-SendData] Fehler: {e}')
-
-    
-    async def discover(self):
-        """Discovers potential servers in the local network."""
-        try:
-            self.potential_servers = []
-            for port in range(self.SERVER_MIN_PORT, self.SERVER_MAX_PORT + 1):
-                try:
-                    await self.sio.connect(f'http://localhost:{port}')
-                    await self.sio.emit(self.SERVER_DISCOVER)
-                    await asyncio.sleep(4)
-                    await self.sio.disconnect()
-
-                except socketio.exceptions.ConnectionError:
-                    logging.debug(f"[Net-Discover] No Service with port: {port}")
-                    continue
-
-                except Exception as e:
-                    logging.error(f'[Net-Discover] Fehler: {e}')
-                    continue
-            
-            return self.potential_servers
-        
-        except Exception as e:
-            logging.error(f'[Net-Discover] Fehler: {e}')        
 
 
 

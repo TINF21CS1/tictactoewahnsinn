@@ -17,7 +17,7 @@ thread_shutdown = threading.Event()
 
 def main():
     # Custom logging format to differentiate between threads
-    logging.basicConfig(level=logging.INFO, format='[%(levelname)s] (%(threadName)s) %(message)s')
+    logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] (%(threadName)s) %(message)s')
 
     # If multiplayer is triggered, start the server and client threads
     # A session name and valid port should be provided
@@ -42,7 +42,6 @@ def main():
 def start_multiplayer_server(name, port):
     server_instance = Server(session_name=name, session_port=port)
     asyncio.run(server_instance.start_server())
-    # pass
 
 
 async def create_multiplayer_game(port):
@@ -50,18 +49,20 @@ async def create_multiplayer_game(port):
     await asyncio.sleep(5)
 
     # Create a client connection to the server
-    connection = Client(port)
+    connection = Client("localhost", port)
     
     # Add event listeners to execute when certain events are received
     connection.event_manager.add_listener(connection.CHAT_TYPE, lambda data: chat_receive(data, connection))
     connection.event_manager.add_listener(connection.ACK_TYPE, lambda data: print(data))
 
     # Discover available servers 
-    potential_servers = await connection.discover()
-    print(potential_servers)
+    connection.start_discover()
+    while connection.DISCOVER_ON:
+        await asyncio.sleep(1)
+    print(connection.potential_servers)
 
     # Check if the server is available
-    if await connection.connect():
+    if await connection.connect(connection.potential_servers[0]["session_host"], connection.potential_servers[0]["session_port"]):
         try:
             while not thread_shutdown.is_set():
                 await test_chat(connection)
