@@ -78,7 +78,7 @@ class MP_Window(Toplevel):
         elif player_X == "False":
             self.player_X = False
 
-        self.turn = self.gm.coin_flip() # Initialisierung über Game-Manager
+        self.turn = None
 
         # Rendern der Objekte:
         self.initialize_board()
@@ -294,6 +294,8 @@ class MP_Window(Toplevel):
                 self.zug_list.insert(END, data_enemy["name"] + " (Gegner) ")
     
     def click(self, event):
+        self.turn = self.gm.coin_flip() # Initialisierung über Game-Manager TODO fix
+
         if self.turn: # Check for coinflip
 
             grid_position = [event.x, event.y]

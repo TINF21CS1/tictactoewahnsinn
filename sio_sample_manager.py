@@ -50,6 +50,7 @@ async def create_multiplayer_game(port):
 
     # Create a client connection to the server
     connection = Client("localhost", port)
+    print(connection)
     
     # Add event listeners to execute when certain events are received
     connection.event_manager.add_listener(connection.CHAT_TYPE, lambda data: chat_receive(data, connection))

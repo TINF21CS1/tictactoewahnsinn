@@ -15,7 +15,7 @@ from threading import Thread, Event
 class Gamemanager:
     
     def __init__(self) -> None:
-        shutdownevent = threading.Event()
+        self.thread_shutdown = threading.Event()
         self.board = Board()
         self.connection = None
         self.coin = None
@@ -24,7 +24,7 @@ class Gamemanager:
 
     def coin_flip(self):
         result = random.randint(0,2**16)
-        self.connection.send_data(self.connect.COIN_TYPE, result)
+        self.connection.send_data(self.connection.COIN_TYPE, result)
         while self.coin == None:
             pass
         return self.coin
@@ -38,13 +38,13 @@ class Gamemanager:
             self.move = 0
         else:
             result = random.randint(0,2**16)
-            self.connection.send_data(self.connect.COIN_TYPE, result)
+            self.connection.send_data(self.connection.COIN_TYPE, result)
                  
     def update_board(self, i, j, player) -> None:
         if self.move == 1:
             self.board[i,j] = player
             data ={"var1": i,"var2": j,"var3": player}
-            self.connection.send_data(self.connect.MOVE_TYPE,data)
+            self.connection.send_data(self.connection.MOVE_TYPE,data)
             self.move = 0
         while self.move == 0:
             pass
@@ -96,10 +96,11 @@ class Gamemanager:
 
         return tie
 
-    def create_lobby(self,game_name):
+    def create_lobby(self, game_name):
+
         # Custom logging format to differentiate between threads
         logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] (%(threadName)s) %(message)s')
-
+        
         # If multiplayer is triggered, start the server and client threads
         # A session name and valid port should be provided
         if True:
@@ -110,21 +111,22 @@ class Gamemanager:
                 thread.start()
         
             # Keep the main thread alive until a keyboard interrupt is detected
-            try:
-                while not self.thread_shutdown.is_set():
-                    time.sleep(1)
-            except KeyboardInterrupt:
-                logging.info("Stopping Threads . . .")
-                self.thread_shutdown.set()
-            for thread in threads:
-                thread.join()
+            #try:
+            #    while not self.thread_shutdown.is_set():
+            #        time.sleep(1)
+            #except KeyboardInterrupt:
+            #    logging.info("Stopping Threads . . .")
+            #    self.thread_shutdown.set()
+            #for thread in threads:
+            #    thread.join()
                 
-    def start_multiplayer_server(name, port):
+    def start_multiplayer_server(self, name, port):
         server_instance = Server(session_name=name, session_port=port)
         asyncio.run(server_instance.start_server())
     
-    async def create_multiplayer_game(self,port):
+    async def create_multiplayer_game(self, port):
         # Wait for the server to start
+        self.connection = Client("localhost", 50000)
         await asyncio.sleep(5)
         
         # Add event listeners to execute when certain events are received
@@ -134,16 +136,18 @@ class Gamemanager:
        
         # Discover available servers 
         self.connection.start_discover()
-        while self.connection.DISCOVER_ON:
-            await asyncio.sleep(1)
+        #while self.connection.DISCOVER_ON:
+        #    await asyncio.sleep(1)
             
     def get_lobbys(self):
         return self.connection.potential_servers 
     
-    def connect(self,name,port):
+    async def connect(self, name, port):
         self.connection = Client(name, port)
+        #logging.debug(self.connection)
     
     def send(self,msg):
+        logging.debug(self.connection)
         self.connection.send_data(self.connection.CHAT_TYPE, msg)        
     
     def chat_safe(self, data):
