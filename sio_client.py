@@ -13,6 +13,8 @@ class Network:
     CHAT_TYPE = "CHAT"      # Event type for chat messages (e.g. player messages)
     DATA_TYPE = "DATA"      # Event type for game data (e.g. board positions)
     TURN_TYPE = "TURN"      # Event type for turn data (e.g. player's turn)
+    COIN_TYPE = "COIN"      # Event type for coinflip data (e.g. player's choice)
+    MOVE_TYPE = "MOVE"      # Event type for move data (e.g. player's move)
     ACK_TYPE = "ACK"        # Event type for acknowledge messages (e.g. successful move)
 
     SERVER_INFO = Server.NETWORK_INFO           # Event type for server information (e.g. connect/disconnect messages)
@@ -126,7 +128,12 @@ class Network:
             return True
         except Exception as e:
             logging.error(f'[Net-Connect] Fehler: {e}')
-            return False   
+            return False
+
+
+    async def disconnect(self):
+           await self.sio.disconnect()
+           logging.info("[Net-Disconnect] Disconnected")
 
 
     async def send_data(self, event, data):
