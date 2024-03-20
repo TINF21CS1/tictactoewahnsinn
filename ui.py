@@ -189,11 +189,6 @@ class Profile(ttk.Frame):
     def __init__(self, container):
         super().__init__(container)
 
-class Cell(ttk.Button):
-    def __init__(self, container, command, x, y):
-        super().__init__(container)
-        self.x = x
-        self.y = y
 
 class Chat(ttk.Frame):
     def __init__(self, container):
