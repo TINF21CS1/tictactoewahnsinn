@@ -13,7 +13,7 @@ symbol_O_color = '#0000FF'
 class MP_Window(Toplevel):
     def __init__(self, player_X):
         super().__init__()
-
+        self.attributes("-topmost", True)
         self.title('Tic-Tac-Toe - Multiplayer Game')
 
         # Check for Win, Lose & Tie
@@ -298,10 +298,13 @@ class MP_Window(Toplevel):
         # Check for Win, Lose & Tie
         if check == "X":
             self.display_gameover("X")
+            self.gm.update_stats("X") #wird durch User-Klasse gehandelt TODO
         elif check == "O":
             self.display_gameover("O")
+            self.gm.update_stats("O") #wird durch User-Klasse gehandelt
         elif check == "Tie":
             self.display_gameover("Tie")
+            self.gm.update_stats("Tie") #wird durch User-Klasse gehandelt
 
         # Zug
         with open("own_stats_example.json","r") as f:

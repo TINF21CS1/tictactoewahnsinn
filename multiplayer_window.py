@@ -10,7 +10,6 @@ class L_Window(Toplevel):
     
     def __init__(self):
         super().__init__()
-
         self.title('Tic-Tac-Toe - Join/Create Multiplayer Game')
 
         # Bildschirmgröße
