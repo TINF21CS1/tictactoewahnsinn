@@ -70,11 +70,18 @@ class Chat(tk.Frame):
         txt = tk.Text(self , width=60)
         scrollbar = ttk.Scrollbar(txt)
 
+class ProfileCreation(tk.Frame):
+    def __init__(self, container):
+        super().__init__(container)
+            
+
 
 if __name__ == "__main__":
     app = App()
+ 
+
     # Create Notebook 
-    notebook = ttk.Notebook()
+    notebook = ttk.Notebook(app)
     notebook.pack(pady=10, fill='both')
    
     # Create game page and add to notebook
@@ -98,7 +105,10 @@ if __name__ == "__main__":
     # Add Label to Game page
     label = ttk.Label(game, text='Player X')
     label.grid(column=0, row=0)
-
+    
+    # Create login
+    profilecreation = ProfileCreation(app)
+    profilecreation.pack(pady=10, fill='both')
     app.mainloop()
 
 
