@@ -19,11 +19,11 @@ class Gamemanager:
         self.board = Board()
         self.connection = None
         self.coin = None
-        self.move = 1
+        self.move = None
 
     def coin_flip(self) -> None:
         result = random.randint(0,2**16)
-        self.connection.send_data("COIN", result)
+        self.connection.send_data(self.connect.COIN_TYPE, result)
         while self.coin == None:
             pass
         return self.coin
@@ -31,17 +31,19 @@ class Gamemanager:
     def determine_starting_player(self,opponent_coin):
         if self.coin > opponent_coin:
             self.coin = True
+            self.move = 1
         elif self.coin < opponent_coin:
             self.coin = False 
+            self.move = 0
         else:
             result = random.randint(0,2**16)
-            self.connection.send_data("COIN", result)
+            self.connection.send_data(self.connect.COIN_TYPE, result)
                  
     def update_board(self, i, j, player) -> None:
         if self.move == 1:
             self.board[i,j] = player
             data ={"var1": i,"var2": j,"var3": player}
-            self.connection.send_data("MOVE",data)
+            self.connection.send_data(self.connect.MOVE_TYPE,data)
             self.move = 0
         while self.move == 0:
             pass
@@ -50,8 +52,6 @@ class Gamemanager:
     def opponent_move(self, move):
         self.board[move["var1"],move["var2"]] = move["var3"]
         self.move = 1
-             
-          
             
     def checkboard(self, board_status, player):
         if player:
@@ -94,15 +94,15 @@ class Gamemanager:
 
         return tie
 
-    def netzwerk_start(self,game_name):
+    def create_lobbyt(self,game_name,port):
         # Custom logging format to differentiate between threads
         logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] (%(threadName)s) %(message)s')
 
         # If multiplayer is triggered, start the server and client threads
         # A session name and valid port should be provided
         if True:
-            server_thread = threading.Thread(name="ServerThread", target=lambda: self.start_multiplayer_server(game_name, 50000))
-            client_thread = threading.Thread(name="GameThread",target=lambda: asyncio.run(self.create_multiplayer_game(50000)))
+            server_thread = threading.Thread(name="ServerThread", target=lambda: self.start_multiplayer_server(game_name, port))
+            client_thread = threading.Thread(name="GameThread",target=lambda: asyncio.run(self.create_multiplayer_game(port)))
             threads = [server_thread, client_thread]
             for thread in threads:
                 thread.start()
@@ -124,30 +124,31 @@ class Gamemanager:
     async def create_multiplayer_game(self,port):
         # Wait for the server to start
         await asyncio.sleep(5)
-
-        # Create a client connection to the server
-        self.connection = Client("localhost", port)
         
         # Add event listeners to execute when certain events are received
-        self.connection.event_manager.add_listener(self.connection.CHAT_TYPE, lambda data: self.chat_receive(data, self.connection))
-        self.connection.event_manager.add_listener(self.connection.CHAT_TYPE, lambda data: self.determine_starting_player(data, self.connection))
-        self.connection.event_manager.add_listener(self.connection.CHAT_TYPE, lambda data: self.opponent_move(data, self.connection))
-        self.connection.event_manager.add_listener(self.connection.ACK_TYPE, lambda data: print(data))
-
+        self.connection.event_manager.add_listener(self.connection.CHAT_TYPE, lambda data: self.chat_safe(data))
+        self.connection.event_manager.add_listener(self.connection.COIN_TYPE, lambda data: self.determine_starting_player(data))
+        self.connection.event_manager.add_listener(self.connection.MOVE_TYPE, lambda data: self.opponent_move(data))
+       
         # Discover available servers 
         self.connection.start_discover()
         while self.connection.DISCOVER_ON:
             await asyncio.sleep(1)
-        print(self.connection.potential_servers)
+            
+    def get_lobbys(self):
+        return self.connection.potential_servers 
     
-    def chat_receive(data, connection):
-        if data == connection.ACK_TYPE:
-            print("ACK received")
-        else:
-            print(f"Chat received: {data}")
+    def connect(self,name,port):
+        self.connection = Client(name, port)
+    
+    def send(self,msg):
+        self.connection.send_data(self.connection.CHAT_TYPE, msg)        
+    
+    def chat_safe(self, data):
+        self.msg = data
         
-        # Sample routine to send an acknowledge message back to the server
-        asyncio.create_task(connection.send_data(connection.ACK_TYPE, data))
-    
+    def chat_recive(self, data):
+        return self.msg
+
     def leave():
         print("Spiel verlassen!")
