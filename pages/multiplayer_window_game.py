@@ -125,11 +125,9 @@ class MP_Window(Toplevel):
     # Functions for chat
 
     def receive(self, msg):
-            try:
-                #msg = network.recv.decode("utf8") #TODO: Chat empfangen
+            msg = self.gm.receive()
+            if len(msg) != 0: # Prevent inserting of zero-fields
                 self.msg_list.insert(END, msg)
-            except OSError:  # Possibly client has left the chat.
-                pass
             self.after(500, self.receive(msg)) # Update every half second
 
     def send(self, window=NONE):
@@ -138,7 +136,7 @@ class MP_Window(Toplevel):
             self.msg_list.insert(END, " me: " + msg + "\n")
             self.my_msg.set("")  # Clears input field
 
-            #network.send(bytes(msg, "utf8")) #TODO: Chat senden
+            self.gm.send(msg)
 
     def chat(self):
         self.messages_frame = Frame(self.chat_canvas, bg='powderblue')
