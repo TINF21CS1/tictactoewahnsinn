@@ -29,6 +29,13 @@ class L_Window(Toplevel):
         self.games_canvas = Canvas(self, width=board_size, height=board_size, bg='lightgray')
         self.games_canvas.grid(rowspan=4, row=0, column=0, sticky=N+W, padx=20, pady=20)
 
+        # Lobbys-Box
+        self.lobbys_frame = Frame(self.games_canvas, bg='powderblue')
+        self.lobbys_frame.pack(side='top', fill="both", padx=3, pady=40)
+
+        self.lobbys_list = Listbox(self.lobbys_frame, font=('arial 10 bold italic'), height=30, width=75)
+        self.lobbys_list.pack(side=TOP, fill=BOTH)
+
         # Join-Game-Objekt
         self.join_game_canvas = Button(self, text="Join Game (IP)", command=self.join_game, width=25, height=6, bg='lightgray')
         self.join_game_canvas.grid(row=1, column=1, sticky=N+E, padx=150)
@@ -85,12 +92,7 @@ class L_Window(Toplevel):
     # Functions for lobbys
     
     def lobbys(self):
-        # Lobbys-Box
-        self.lobbys_frame = Frame(self.games_canvas, bg='powderblue')
-        self.lobbys_frame.pack(side='top', fill="both", padx=3, pady=40)
-
-        self.lobbys_list = Listbox(self.lobbys_frame, font=('arial 10 bold italic'), height=30, width=75)
-        self.lobbys_list.pack(side=TOP, fill=BOTH)
+        self.lobbys_list.delete(0,END) # For update-functionality
 
         try:
             data = network.get_lobbys() #TODO
@@ -103,6 +105,8 @@ class L_Window(Toplevel):
         except:
             self.lobbys_list.insert(END, " Keine offenen Lobbys vohanden ")
             self.lobbys_list.insert(END, "")
+
+        self.after(500, self.lobbys) # Update every half second
 
     def join_game(self):
         ip = askstring("Connect to Multiplayer Game", "Enter Game-IP:")
