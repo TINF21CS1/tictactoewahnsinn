@@ -3,7 +3,8 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font 
-import user
+from actors import user
+from gamestate import board
 
 class App(tk.Tk):
     def __init__(self):
@@ -112,6 +113,7 @@ class Board(ttk.Frame):
         self._cells = {}
         self.create_grid()
 
+
     def create_grid(self):
         for row in range(3):
             self.rowconfigure(row, weight=1, minsize=50)
@@ -124,7 +126,7 @@ class Board(ttk.Frame):
                     fg="black",
                     width=3,
                     height=2,
-                    highlightbackground="lightblue"
+                    highlightbackground="lightblue",
                 )
                 self._cells[button] = (row, col)
                 button.grid(
@@ -204,7 +206,7 @@ class Controller():
             self.model.save()
 
             self.view.show_success(f'The username {username} is saved!')
-            self.view.frame_switcher.show_frame(Notebook)
+            self.view.after(1000, lambda:self.view.frame_switcher.show_frame(Notebook))
 
         except ValueError as error:
             print('error')
