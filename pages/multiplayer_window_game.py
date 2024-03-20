@@ -77,8 +77,8 @@ class MP_Window(Toplevel):
             self.player_X = True
         elif player_X == "False":
             self.player_X = False
-        else:   # Nur zum Testen!!!
-            self.player_X = True
+
+        self.turn = self.gm.coin_flip() # Initialisierung über Game-Manager
 
         # Rendern der Objekte:
         self.initialize_board()
@@ -125,12 +125,12 @@ class MP_Window(Toplevel):
     # Functions for chat
 
     def receive(self, msg):
-        while True:
             try:
                 #msg = network.recv.decode("utf8") #TODO: Chat empfangen
                 self.msg_list.insert(END, msg)
             except OSError:  # Possibly client has left the chat.
-                break
+                pass
+            self.after(500, self.receive(msg)) # Update every half second
 
     def send(self, window=NONE):
         msg = self.my_msg.get()
@@ -182,7 +182,7 @@ class MP_Window(Toplevel):
             data_enemy = json.load(g)
         
         # Only for initialization
-        if self.player_X:
+        if self.turn:
             self.zug_list.insert(END, data_own["name"] + " (Ich) ")
         else:
             self.zug_list.insert(END, data_enemy["name"] + " (Gegner) ")
@@ -270,39 +270,15 @@ class MP_Window(Toplevel):
 
         self.board_canvas.delete("all")
         self.board_canvas.create_text(board_size / 2, board_size / 3, font="cmr 30 bold", fill=color, text=text)
-
-    def click(self, event):
-        grid_position = [event.x, event.y]
-        logical_position = self.grid_to_logical(grid_position)
-
-        if self.player_X and not self.is_grid_occupied(logical_position):
-                self.draw_X(logical_position)
-                self.board_status[logical_position[0]][logical_position[1]] = -1
-                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie TODO
-                self.player_X = False # Stetigen Wechsel
-
-                print("Player X: " + str(self.board_status))
-                print("Sende Board an O...") # Senden: Board
-        else:
-            if not self.is_grid_occupied(logical_position):
-                self.draw_O(logical_position)
-                self.board_status[logical_position[0]][logical_position[1]] = 1
-                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie TODO
-                self.player_X = True # Stetigen Wechsel
-
-                print("Player O: " + str(self.board_status))
-                print("Sende Board an X...") # Senden: Board
-
+    
+    def check(self, check):
         # Check for Win, Lose & Tie
         if check == "X":
             self.display_gameover("X")
-            self.gm.update_stats("X") #wird durch User-Klasse gehandelt TODO
         elif check == "O":
             self.display_gameover("O")
-            self.gm.update_stats("O") #wird durch User-Klasse gehandelt
         elif check == "Tie":
             self.display_gameover("Tie")
-            self.gm.update_stats("Tie") #wird durch User-Klasse gehandelt
 
         # Zug
         with open("own_stats_example.json","r") as f:
@@ -312,9 +288,59 @@ class MP_Window(Toplevel):
             data_enemy = json.load(g)
         
         if not (check == "X" or check == "O" or check == "Tie"):
-            if self.player_X:
+            if self.change:
                 self.zug_list.delete(0,END)  # Clears Listbox
                 self.zug_list.insert(END, data_own["name"] + " (Ich) ")
             else:
                 self.zug_list.delete(0,END)  # Clears Listbox
                 self.zug_list.insert(END, data_enemy["name"] + " (Gegner) ")
+    
+    def click(self, event):
+        if self.turn: # Check for coinflip
+
+            grid_position = [event.x, event.y]
+            logical_position = self.grid_to_logical(grid_position)
+
+            if self.player_X and not self.is_grid_occupied(logical_position):
+                self.draw_X(logical_position)
+                self.board_status[logical_position[0]][logical_position[1]] = -1
+                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie
+
+                print("Player X: " + str(self.board_status))
+                print("Sende Board an O...") # Senden: Board
+
+            elif not self.player_X and not self.is_grid_occupied(logical_position):
+                self.draw_O(logical_position)
+                self.board_status[logical_position[0]][logical_position[1]] = 1
+                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie
+
+                print("Player O: " + str(self.board_status))
+                print("Sende Board an X...") # Senden: Board
+
+            self.check(check)
+            self.change = not self.change # Toggle für stetigen Wechsel
+
+            logical_position = self.gm.update_board(logical_position[0], logical_position[1], self.player_X)
+
+            if not self.player_X and logical_position and not self.is_grid_occupied(logical_position):
+                self.draw_X(logical_position)
+                self.board_status[logical_position[0]][logical_position[1]] = -1
+                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie
+
+            elif self.player_X and logical_position and not self.is_grid_occupied(logical_position):
+                self.draw_O(logical_position)
+                self.board_status[logical_position[0]][logical_position[1]] = 1
+                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie
+
+        else:
+            logical_position = self.gm.update_board(5, 5, self.player_X) # Initialization
+            if self.player_X:
+                self.draw_X(logical_position)
+                self.board_status[logical_position[0]][logical_position[1]] = -1
+            else:
+                self.draw_O(logical_position)
+                self.board_status[logical_position[0]][logical_position[1]] = 1
+            self.turn = True
+            self.change = True
+            self.check("")
+            self.click(event)
