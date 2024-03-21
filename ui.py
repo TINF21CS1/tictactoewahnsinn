@@ -33,7 +33,7 @@ class App(tk.Tk):
 
         model = user.User()
         view = self.frames[ProfileCreation]
-        controller = Controller(model, view)
+        controller = ProfileController(model, view)
         view.set_controller(controller)
          
 
@@ -86,7 +86,6 @@ class Notebook(ttk.Notebook):
             self.hide(1)
 
 
-
 class Game(ttk.Frame):
     def __init__(self, container, frame_switcher):
         super().__init__(container)
@@ -102,7 +101,8 @@ class Game(ttk.Frame):
         # MVC for Board
         model = board.Board() 
         view = board_view
-        controller = BoardController(model, view)
+        opponent = ai.AI(model, 3)
+        controller = BoardController(model, view, opponent)
         view.set_controller(controller)
          
 
@@ -150,40 +150,82 @@ class BoardView(ttk.Frame):
                 )
 
 
-
     def pressed(self, event):
-        clicked_btn = event.widget
-        (row, col) = self._cells[clicked_btn]
-        if self.controller:
-            self.controller.move((row, col))
-            self.controller.ai_move()
-            
+        if event.widget['state'] != tk.DISABLED:
+            clicked_btn = event.widget
+            (row, col) = self._cells[clicked_btn]
+            if self.controller:
+                self.controller.move((row, col))
+                self.update_button(clicked_btn, 'X')
+
+    def update_button(self, arg, symbol):
+        if type(arg) == tk.Button:
+            (row, col) = self._cells[arg]
+            symbol = self.controller.get_value((row, col))
+            arg.config(text=symbol, state='disabled')
+        if type(arg) == tuple:
+            for key, value in self._cells.items():
+                if value == arg:
+                    symbol = self.controller.get_value(arg)
+                    key.config(text=symbol, state='disabled')
         
 
 class BoardController():
-    def __init__(self, model, view):
+    def __init__(self, model, view, opponent):
         self.model = model
         self.view = view
-        self.ai = ai.AI(model, 4)
+        self.opponent = opponent 
 
     def move(self, pos):
-        try:
-            self.model[pos] = 'X'
-            self.model.display_board()
+            try:
+                self.model[pos] = 'X'
+                self.model.display_board()
+                if self.game_done('X') == False:
+                    self.opponent_move()
+                else:
+                    self.deactive_buttons()
 
+            except ValueError as error:
+                print('error')
+                self.view.show_error(error)
+    
+    def opponent_move(self):
+            try:
+                pos = self.opponent.move()
+                self.model[pos] = 'O'
+                self.model.display_board()
+                self.view.update_button(pos, 'Y')
+                if self.game_done('O') == True:
+                    self.deactive_buttons()
+
+            except ValueError as error:
+                print('error')
+                self.view.show_error(error)
+    
+    def deactive_buttons(self):
+        for button in self.view._cells:
+            button.config(state='disabled')
+
+    def get_value(self, pos):
+        try:
+            return self.model[pos]
         except ValueError as error:
             print('error')
             self.view.show_error(error)
     
-    def ai_move(self):
+    def game_done(self, player):
         try:
-            pos = self.ai.ai_move()
-            print(pos)
-            self.model[pos] = 'O'
-            self.model.display_board()
+            if self.model.check_win(player):
+                print(f'{player} won')
+                return True
+            elif self.model.is_draw():
+                print('Draw')
+                return True
+            return False
         except ValueError as error:
             print('error')
             self.view.show_error(error)
+     
   
 class Profile(ttk.Frame):
     def __init__(self, container):
@@ -238,7 +280,7 @@ class ProfileCreation(ttk.Frame):
     def hide_message(self):
         self.message_label['text'] = ''
 
-class Controller():
+class ProfileController():
     def __init__(self, model, view):
         self.model = model
         self.view = view
