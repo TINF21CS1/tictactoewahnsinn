@@ -6,8 +6,8 @@ import threading
 import numpy as np
 
 from gamestate.board import Board
-from sio_server import Server
-from sio_client import Network as Client
+from networking.sio_server import Server
+from networking.sio_client import Network as Client
 from threading import Thread, Event
 
 
