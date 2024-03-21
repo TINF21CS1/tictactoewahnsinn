@@ -180,7 +180,7 @@ class BoardController():
             try:
                 self.model[pos] = 'X'
                 self.model.display_board()
-                if self.game_done('X') == False:
+                if self.game_over('X') == False:
                     self.opponent_move()
                 else:
                     self.deactive_buttons()
@@ -195,7 +195,7 @@ class BoardController():
                 self.model[pos] = 'O'
                 self.model.display_board()
                 self.view.update_button(pos, 'Y')
-                if self.game_done('O') == True:
+                if self.game_over('O') == True:
                     self.deactive_buttons()
 
             except ValueError as error:
@@ -213,7 +213,7 @@ class BoardController():
             print('error')
             self.view.show_error(error)
     
-    def game_done(self, player):
+    def game_over(self, player):
         try:
             if self.model.check_win(player):
                 print(f'{player} won')
@@ -237,9 +237,6 @@ class Chat(ttk.Frame):
         super().__init__(container)
         txt = tk.Text(self , width=60)
         scrollbar = ttk.Scrollbar(txt)
-
-def create_profile():
-    print("button pressed") 
 
 class ProfileCreation(ttk.Frame):
     def __init__(self, container, frame_switcher):

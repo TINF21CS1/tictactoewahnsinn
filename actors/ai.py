@@ -99,7 +99,7 @@ class AI():
             return min_eval
 
 
-    def ai_move(self):
+    def move(self):
         """
         Determine the optimal move for the AI player using Minimax algorithm.
 
