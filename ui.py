@@ -112,8 +112,11 @@ class Game(ttk.Frame):
         chat.grid(column=1, row=1)
 
         # Add Label to Game page
-        label = ttk.Label(self, text='Player X')
-        label.grid(column=0, row=0)
+        self.label = ttk.Label(self, text='Ready?')
+        self.label.grid(column=0, row=0)
+
+    def change_label(self, text):
+        self.label.config(text=text)
     
     def set_ai_difficulty(self, difficulty):
         self.difficulty = difficulty
@@ -126,6 +129,7 @@ class BoardView(ttk.Frame):
         super().__init__(container)
         self._cells = {}
         self.create_grid()
+        self.container = container
         
     def set_controller(self, controller):
         self.controller = controller
@@ -185,10 +189,16 @@ class BoardController():
             try:
                 self.model[pos] = 'X'
                 self.model.display_board()
-                if self.game_over('X') == False:
+                print(self.check_win('X') and self.check_draw())
+                if self.check_win('X') == True:
+                    self.deactivate_buttons()
+                    self.view.container.change_label("Player X won!")
+                elif self.check_draw():
+                    self.deactivate_buttons()
+                    self.view.container.change_label("Draw")
+                else: 
+                    self.view.container.change_label("Player Y's turn")
                     self.opponent_move()
-                else:
-                    self.deactive_buttons()
 
             except ValueError as error:
                 print('error')
@@ -200,14 +210,19 @@ class BoardController():
                 self.model[pos] = 'O'
                 self.model.display_board()
                 self.view.update_button(pos, 'Y')
-                if self.game_over('O') == True:
-                    self.deactive_buttons()
+                self.view.container.change_label("Player X's turn")
+                if self.check_win('O'):
+                    self.deactivate_buttons()
+                    self.view.container.change_label("Player O won!")
+                elif self.check_draw():
+                    self.deactivate_buttons()
+                    self.view.container.change_label("Draw")
 
             except ValueError as error:
                 print('error')
                 self.view.show_error(error)
     
-    def deactive_buttons(self):
+    def deactivate_buttons(self):
         for button in self.view._cells:
             button.config(state='disabled')
 
@@ -218,18 +233,21 @@ class BoardController():
             print('error')
             self.view.show_error(error)
     
-    def game_over(self, player):
+    def check_win(self, player):
         try:
-            if self.model.check_win(player):
-                print(f'{player} won')
-                return True
-            elif self.model.is_draw():
-                print('Draw')
-                return True
-            return False
+            return self.model.check_win(player)
         except ValueError as error:
             print('error')
             self.view.show_error(error)
+
+    def check_draw(self):
+        try:
+            return self.model.is_draw()
+        except ValueError as error:
+            print('error')
+            self.view.show_error(error)
+
+
      
   
 class Profile(ttk.Frame):
