@@ -6,6 +6,15 @@ from tkinter import font
 from actors import user
 from actors import ai
 from gamestate import board
+import matplotlib
+
+matplotlib.use('TkAgg')
+
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg,
+    NavigationToolbar2Tk
+)
 
 class App(tk.Tk):
     def __init__(self):
@@ -73,7 +82,7 @@ class Notebook(ttk.Notebook):
             self.frames[F] = frame
         
         # Create profile page and add to notebook
-        profile = ttk.Frame(self)
+        profile = Profile(self)
         profile.pack(fill='both', expand=True)
 
         self.add(profile, text='Profile')
@@ -131,6 +140,7 @@ class Game(ttk.Frame):
         self.rematch = ttk.Button(master=self.placeholder, text="Rematch", command=lambda: self.controller.new_game())
         self.leave.pack(side=tk.LEFT, expand=True)
         self.rematch.pack(side=tk.LEFT, expand=True)
+
 
 
 class BoardView(ttk.Frame):
@@ -276,7 +286,34 @@ class BoardController():
 class Profile(ttk.Frame):
     def __init__(self, container):
         super().__init__(container)
+        self.model = user.User()
+        self.controller = ProfileController(self.model, self)
+        self.display_data()
+   
+    def set_controller(self, controller):
+        self.controller = controller
+    
+    def display_data(self):
+        data = self.controller.get_data()
+        name = data.pop('name')
+        uid = data.pop('id')
+        stats = data.keys()
+        occurences = data.values()
+        # create a figure
+        figure = Figure(figsize=(6, 4), dpi=100)
 
+        # create FigureCanvasTkAgg object
+        figure_canvas = FigureCanvasTkAgg(figure, self)
+
+        # create axes
+        axes = figure.add_subplot()
+
+        # create the barchart
+        axes.bar(stats, occurences)
+        axes.set_xlabel('Wins / Draws / Losses')
+        axes.set_ylabel('Count')
+
+        figure_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)        
 
 class Chat(ttk.Frame):
     def __init__(self, container):
@@ -339,6 +376,26 @@ class ProfileController():
         except ValueError as error:
             print('error')
             self.view.show_error(error)
+
+    def update_statistics(self, status):
+        try:
+            self.model._update_statistics(status)
+        
+        except ValueError as error:
+            print('error')
+            self.view.show_error(error)
+    
+    def get_data(self):
+        return self.model.get_data()
+
+    def update_statistics(self, status):
+        try:
+            self.model._update_statistics(status)
+        
+        except ValueError as error:
+            print('error')
+            self.view.show_error(error)
+               
 
 if __name__ == "__main__":
     app = App()
