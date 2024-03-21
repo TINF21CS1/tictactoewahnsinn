@@ -1,9 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 import json
-from pages.settings_window import S_Window
-from pages.singleplayer_window_game import SP_Window
-from pages.multiplayer_window import L_Window
+from ui.settings_window import S_Window
+from ui.singleplayer_window_game import SP_Window
+from ui.multiplayer_window import L_Window
 
 # Global Settings
 board_size = 600
@@ -49,9 +49,9 @@ class M_Window():
         Label(self.singleplayer_canvas, text="Singleplayer (KI): ", bg='lightgray', width=15, height=2).grid(row=0, column=0, sticky=N, padx=5, pady=5)
 
         # Schwierigkeitsgrad für KI
-        self.difficulty = ["leicht", "schwer"]
+        self.difficulty = ["easy", "difficult"]
         self.Combo = ttk.Combobox(self.singleplayer_canvas, values = self.difficulty, state="readonly")
-        self.Combo.set(" Schwierigkeitsgrad ")
+        self.Combo.set(" Difficulty ")
         self.Combo.grid(row=0, column=0, sticky=N, padx=15, pady=45)
 
         # Create-Objekt
@@ -110,14 +110,14 @@ class M_Window():
         
         # Own stats
         if len(data) != 0: # Prevent rendering empty data
-            self.stats_list.insert(END, " Eigene Statistiken (" + data["name"] + "): \n")
+            self.stats_list.insert(END, " Own Statistics (" + data["name"] + "): \n")
 
-            self.stats_list.insert(END, " - Siege: " + data["wins"] + "\n")
-            self.stats_list.insert(END, " - Unentschieden: " + data["draws"] + "\n")
-            self.stats_list.insert(END, " - Niederlage: " + data["losses"] + "\n")
+            self.stats_list.insert(END, " - Wins: " + data["wins"] + "\n")
+            self.stats_list.insert(END, " - Ties: " + data["draws"] + "\n")
+            self.stats_list.insert(END, " - Losses: " + data["losses"] + "\n")
             self.stats_list.insert(END, "")
         else:
-            self.stats_list.insert(END, " Fehler beim Laden der eigenen Statistiken")
+            self.stats_list.insert(END, " Error while loading local statistics")
             self.stats_list.insert(END, "")
 
         self.window.after(1000, self.stats) # Update every Second
