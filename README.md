@@ -78,3 +78,37 @@ while client.DISCOVER_ON:
 servers = client.potential_servers
 ```
 ---
+### The TicTacToe Game Manager is a Python class designed to facilitate the management of TicTacToe multiplayer modes. It provides functionalities for game setup, board management, player movements, win/tie conditions checking, lobby creation, server-client communication, and more.
+
+### Dependencies
+-asyncio
+-aiohttp
+-socketio
+-You can install these dependencies using pip:
+
+**Set up the game lobby:**
+game_manager.create_lobbyt("MyGameLobby", 5000)
+
+**Connect to the game lobby:**
+game_manager.connect("MyGameLobby", 5000)
+
+Interact with the game:
+# Example: Send a chat message
+game_manager.send("Hello, everyone!")
+
+# Example: Make a move on the board
+game_manager.update_board(0, 0, 1)  # Player 1 moves to position (0, 0)
+Features
+
+# Game Setup: Create and manage game lobbies for multiplayer games.
+# Board Management: Update and check the status of the game board.
+# Player Movements: Make moves on the board and handle opponent moves.
+# Win/Tie Conditions: Check for win or tie conditions after each move.
+# Server-Client Communication: Facilitate communication between game clients and servers.
+# Multiplayer Support
+# The TicTacToe Game Manager supports multiplayer mode through server-client architecture. It enables the creation of game lobbies, discovery of available servers, and communication between game clients.
+
+
+
+
+
