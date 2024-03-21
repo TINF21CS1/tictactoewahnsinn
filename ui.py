@@ -56,8 +56,8 @@ class Multiplayer(ttk.Frame):
 class ChooseAiLevel(ttk.Frame):
     def __init__(self, container, frame_switcher):
         super().__init__(container)
-        easy = ttk.Button(self, text='Easy', command=lambda: [frame_switcher.show_frame(Game), frame_switcher.frames[Game].set_ai_difficulty(2)])
-        hard = ttk.Button(self, text='Hard', command=lambda: [frame_switcher.show_frame(Game), frame_switcher.frames[Game].set_ai_difficulty(9)])
+        easy = ttk.Button(self, text='Easy', command=lambda: [frame_switcher.show_frame(Game), frame_switcher.frames[Game].set_ai_difficulty(1)])
+        hard = ttk.Button(self, text='Hard', command=lambda: [frame_switcher.show_frame(Game), frame_switcher.frames[Game].set_ai_difficulty(4)])
         easy.pack()
         hard.pack()
 
@@ -90,18 +90,18 @@ class Game(ttk.Frame):
     def __init__(self, container, frame_switcher):
         super().__init__(container)
         self.rowconfigure(0, weight=1)
-        self.rowconfigure(1, weight=9)
+        self.rowconfigure(1, weight=10)
+        self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=3)
-        self.columnconfigure(0, weight=2)
+        self.columnconfigure(1, weight=2)
         self.difficulty = 0
-   
+        self.frame_switcher = frame_switcher 
          # Add Board to Game page
-        board_view = BoardView(self)
-        board_view.grid(column=0, row=1)
+        self.view = BoardView(self)
+        self.view.grid(column=0, row=1)
         
         # MVC for Board
         self.model = board.Board() 
-        self.view = board_view
         self.opponent = ai.AI(self.model, self.difficulty)
         self.controller = BoardController(self.model, self.view, self.opponent)
         self.view.set_controller(self.controller)
@@ -115,14 +115,23 @@ class Game(ttk.Frame):
         self.label = ttk.Label(self, text='Ready?')
         self.label.grid(column=0, row=0)
 
-    def change_label(self, text):
-        self.label.config(text=text)
+    def change_label(self, argument):
+        self.label.config(text=argument)
     
     def set_ai_difficulty(self, difficulty):
         self.difficulty = difficulty
         if type(self.opponent == ai.AI):
             self.opponent.change_depth(difficulty) 
             print(difficulty)
+
+    def rematch_leave(self):
+        self.placeholder = ttk.Frame(self)
+        self.placeholder.grid(column=0, row=2)
+        self.leave = ttk.Button(master=self.placeholder, text="Leave", command=lambda: self.frame_switcher.show_frame(ChooseGamemode))
+        self.rematch = ttk.Button(master=self.placeholder, text="Rematch", command=lambda: self.controller.new_game())
+        self.leave.pack(side=tk.LEFT, expand=True)
+        self.rematch.pack(side=tk.LEFT, expand=True)
+
 
 class BoardView(ttk.Frame):
     def __init__(self, container):
@@ -133,6 +142,10 @@ class BoardView(ttk.Frame):
         
     def set_controller(self, controller):
         self.controller = controller
+
+    def clear_board(self):
+       for button in self._cells:
+            button.config(state='normal', text="")
 
     def create_grid(self):
         for row in range(3):
@@ -177,13 +190,19 @@ class BoardView(ttk.Frame):
                 if value == arg:
                     symbol = self.controller.get_value(arg)
                     key.config(text=symbol, state='disabled')
-        
+
 
 class BoardController():
     def __init__(self, model, view, opponent):
         self.model = model
         self.view = view
         self.opponent = opponent 
+
+    def new_game(self):
+        self.model.clear_board()
+        self.view.clear_board()
+        self.view.container.placeholder.grid_forget()
+        self.view.container.change_label("Player X's turn")
 
     def move(self, pos):
             try:
@@ -193,9 +212,11 @@ class BoardController():
                 if self.check_win('X') == True:
                     self.deactivate_buttons()
                     self.view.container.change_label("Player X won!")
+                    self.view.container.rematch_leave()
                 elif self.check_draw():
                     self.deactivate_buttons()
                     self.view.container.change_label("Draw")
+                    self.view.container.rematch_leave()
                 else: 
                     self.view.container.change_label("Player Y's turn")
                     self.opponent_move()
@@ -206,17 +227,19 @@ class BoardController():
     
     def opponent_move(self):
             try:
+                self.view.container.change_label("Player X's turn")
                 pos = self.opponent.move()
                 self.model[pos] = 'O'
                 self.model.display_board()
                 self.view.update_button(pos, 'Y')
-                self.view.container.change_label("Player X's turn")
                 if self.check_win('O'):
                     self.deactivate_buttons()
                     self.view.container.change_label("Player O won!")
+                    self.view.container.rematch_leave()
                 elif self.check_draw():
                     self.deactivate_buttons()
                     self.view.container.change_label("Draw")
+                    self.view.container.rematch_leave()
 
             except ValueError as error:
                 print('error')
