@@ -305,7 +305,7 @@ class AI():
             return arr
         elif self.diff == "difficult":
             self._max_depth = 9
-            arr = self.schwerer_spielzug()
+            arr = self.schwerer_spielzug(board_status)
             print(arr)
             return arr
             
@@ -316,52 +316,43 @@ class AI():
 
         return [zeile, spalte]
     
-    def schwerer_spielzug(self):
-
+    def schwerer_spielzug(self, board):
         best_eval = -float('inf')
         best_move = None
 
         for i in range(3):
             for j in range(3):
-                if self._board[i, j] == ' ':
-                    self._board[i, j] = 'O'
-                    eval = self.minimax(0, False)
-                    self._board[i, j] = ' '
+                if board[i][j] == 0:
+                    board[i][j] = 1
+                    eval = self.minimax(0, False, board)
+                    board[i][j] = 0
                     if eval > best_eval:
                         best_eval = eval
-                        best_move = (i, j)
-
+                        best_move = [i, j]
         return best_move
-    
-    def minimax(self, depth, is_maximizing):
+
+    def minimax(self, depth, is_maximizing, board):
+        if depth == 9:
+            # Base case: depth limit reached
+            return 0
 
         if is_maximizing:
-            # If maximizing, initialize the maximum evaluation score to negative infinity
             max_eval = -float('inf')
             for i in range(3):
                 for j in range(3):
-                    if self._board[i, j] == ' ':
-                        # Simulate the move for the maximizing player ('O')
-                        self._board[i, j] = 'O'
-                        # Recursively call minimax for the next level with the minimizing player's turn
-                        eval = self.minimax(depth + 1, False)
-                        # Undo the move
-                        self._board[i, j] = ' '
-                        # Update the maximum evaluation score
+                    if board[i][j] == 0:
+                        board[i][j] = 1
+                        eval = self.minimax(depth + 1, False, board)
+                        board[i][j] = 0
                         max_eval = max(max_eval, eval)
             return max_eval
         else:
-            # If minimizing, initialize the minimum evaluation score to positive infinity
             min_eval = float('inf')
             for i in range(3):
                 for j in range(3):
-                    if self._board[i, j] == ' ':
-                        # Simulate the move for the minimizing player ('X')
-                        self._board[i, j] = 'X'
-                        # Recursively call minimax for the next level with the maximizing player's turn
-                        eval = self.minimax(depth + 1, True)
-                        # Undo the move
-                        self._board[i, j] = ' '
-                        # Update the minimum evaluation score
+                    if board[i][j] == 0:
+                        board[i][j] = -1
+                        eval = self.minimax(depth + 1, True, board)
+                        board[i][j] = 0
                         min_eval = min(min_eval, eval)
             return min_eval
