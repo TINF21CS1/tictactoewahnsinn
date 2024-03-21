@@ -1,9 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 import json
-from settings_window import S_Window
-from singleplayer_window_game import SP_Window
-from multiplayer_window import L_Window
+from ui.settings_window import S_Window
+from ui.singleplayer_window_game import SP_Window
+from ui.multiplayer_window import L_Window
 
 # Global Settings
 board_size = 600

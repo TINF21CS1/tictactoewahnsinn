@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter.simpledialog import askstring
 from tkinter import messagebox
-from multiplayer_window_game import MP_Window
+from .multiplayer_window_game import MP_Window
 
 # Global Settings
 board_size = 600
