@@ -38,13 +38,14 @@ class App(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky='nsew')
         
-        self.show_frame(ProfileCreation)
-
         model = user.User()
         view = self.frames[ProfileCreation]
         controller = ProfileController(model, view)
         view.set_controller(controller)
-         
+
+        self.show_frame(ProfileCreation)
+
+                 
 
     def show_frame(self, frame):
         frame = self.frames[frame]
@@ -82,10 +83,10 @@ class Notebook(ttk.Notebook):
             self.frames[F] = frame
         
         # Create profile page and add to notebook
-        profile = Profile(self)
-        profile.pack(fill='both', expand=True)
+        self.profile = Profile(self)
+        self.profile.pack(fill='both', expand=True)
 
-        self.add(profile, text='Profile')
+        self.add(self.profile, text='Profile')
         self.show_frame(ChooseGamemode)
 
     def show_frame(self, frame):
@@ -207,7 +208,7 @@ class BoardController():
         self.model = model
         self.view = view
         self.opponent = opponent 
-
+    
     def new_game(self):
         self.model.clear_board()
         self.view.clear_board()
@@ -222,6 +223,7 @@ class BoardController():
                 if self.check_win('X') == True:
                     self.deactivate_buttons()
                     self.view.container.change_label("Player X won!")
+                    self.view.container.frame_switcher.profile.controller.update_statistics("win")
                     self.view.container.rematch_leave()
                 elif self.check_draw():
                     self.deactivate_buttons()
@@ -281,8 +283,6 @@ class BoardController():
             self.view.show_error(error)
 
 
-     
-  
 class Profile(ttk.Frame):
     def __init__(self, container):
         super().__init__(container)
@@ -299,16 +299,9 @@ class Profile(ttk.Frame):
         uid = data.pop('id')
         stats = data.keys()
         occurences = data.values()
-        # create a figure
         figure = Figure(figsize=(6, 4), dpi=100)
-
-        # create FigureCanvasTkAgg object
         figure_canvas = FigureCanvasTkAgg(figure, self)
-
-        # create axes
         axes = figure.add_subplot()
-
-        # create the barchart
         axes.bar(stats, occurences)
         axes.set_xlabel('Wins / Draws / Losses')
         axes.set_ylabel('Count')

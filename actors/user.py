@@ -34,10 +34,16 @@ class Player():
     def get_losses(self):
         return self._losses
 
+    def get_data(self):
+        return {"name": self._name, "id": self._id, "wins": self._wins, "draws": self._draws, "losses": self._losses}
+
     def __str__(self):
         return f"{self._name} {self._id} {self._wins} {self._draws} {self._losses}"
 
 class User(Player):
+    def __init__(self, name = "", wins=0, draws=0, losses=0, id=uuid.uuid4()):
+        super().__init__(name = "", wins=0, draws=0, losses=0, id=uuid.uuid4())
+
     @classmethod
     def from_data(cls): 
         with open('user_data.json', 'r') as user_data:
@@ -51,6 +57,7 @@ class User(Player):
         return cls(name, wins, draws, losses, id)
 
     def save(self):
+        print("writing to disk")
         with open("user_data.json", "w") as user_data:
             json.dump({"name": self._name, "id": str(self._id), "wins": self._wins, "draws": self._draws, "losses": self._losses}, user_data) 
 
