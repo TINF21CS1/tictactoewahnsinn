@@ -77,8 +77,6 @@ class MP_Window(Toplevel):
             self.player_X = True
         elif player_X == "False":
             self.player_X = False
-        else:   # Nur zum Testen!!!
-            self.player_X = True
 
         # Rendern der Objekte:
         self.initialize_board()
@@ -127,7 +125,7 @@ class MP_Window(Toplevel):
     def receive(self, msg):
         while True:
             try:
-                #msg = network.recv.decode("utf8") #TODO: Chat empfangen
+                #msg = network.recv.decode("utf8")
                 self.msg_list.insert(END, msg)
             except OSError:  # Possibly client has left the chat.
                 break
@@ -138,7 +136,7 @@ class MP_Window(Toplevel):
             self.msg_list.insert(END, " me: " + msg + "\n")
             self.my_msg.set("")  # Clears input field
 
-            #network.send(bytes(msg, "utf8")) #TODO: Chat senden
+            #network.send(bytes(msg, "utf8"))
 
     def chat(self):
         self.messages_frame = Frame(self.chat_canvas, bg='powderblue')
@@ -278,7 +276,7 @@ class MP_Window(Toplevel):
         if self.player_X and not self.is_grid_occupied(logical_position):
                 self.draw_X(logical_position)
                 self.board_status[logical_position[0]][logical_position[1]] = -1
-                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie TODO
+                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie
                 self.player_X = False # Stetigen Wechsel
 
                 print("Player X: " + str(self.board_status))
@@ -287,7 +285,7 @@ class MP_Window(Toplevel):
             if not self.is_grid_occupied(logical_position):
                 self.draw_O(logical_position)
                 self.board_status[logical_position[0]][logical_position[1]] = 1
-                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie TODO
+                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie
                 self.player_X = True # Stetigen Wechsel
 
                 print("Player O: " + str(self.board_status))
@@ -296,7 +294,7 @@ class MP_Window(Toplevel):
         # Check for Win, Lose & Tie
         if check == "X":
             self.display_gameover("X")
-            self.gm.update_stats("X") #wird durch User-Klasse gehandelt TODO
+            self.gm.update_stats("X") #wird durch User-Klasse gehandelt
         elif check == "O":
             self.display_gameover("O")
             self.gm.update_stats("O") #wird durch User-Klasse gehandelt

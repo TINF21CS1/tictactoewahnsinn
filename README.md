@@ -78,6 +78,7 @@ while client.DISCOVER_ON:
 servers = client.potential_servers
 ```
 ---
+<<<<<<< Updated upstream
 ### The TicTacToe Game Manager is a Python class designed to facilitate the management of TicTacToe multiplayer modes. It provides functionalities for game setup, board management, player movements, win/tie conditions checking, lobby creation, server-client communication, and more.
 
 ### Dependencies
@@ -112,3 +113,22 @@ Features
 
 
 
+=======
+
+## UI (Chris)
+
+The UI uses tkinter as main component and was designed to have a ground up structure (start from main menu up to multiplayer-game), where the windows inherit everything important from the parent-window. The clean design is quite similar in every window for easy, straightforward debugging and good user experience. Every window is structured using the grid-layout from tkinter, where every object is placed inside a object-canvas to have an easy option for repositioning.
+
+### Key Components/Classes
+- **Main-Window:** Start of the game with a clean and easy user experience with display of own statistics.
+- **Lobby-Window:** Display open game-lobbys, join a lobby or create one.
+- **Singleplayer-Window:** Play against an ai-opponent (two difficulty-modes) and display statistics.
+- **Multiplayer-Window:** Play against an opponent over the network and display own and enemy statistics.
+- **Settings-Window:** Change and inspect own settings like id, name, country.
+
+### Dependencies
+- numpy
+
+### Usage
+All classes should always run in the full game implementation to work as intended. For testing purposes, every window can be tested separately using the mainloop()-function (removing the inheritance-part at the beginning of the class first)
+>>>>>>> Stashed changes

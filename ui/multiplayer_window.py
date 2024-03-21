@@ -87,12 +87,12 @@ class L_Window(Toplevel):
         self.lobbys_list.delete(0,END) # For update-functionality
 
         try:
-            data = network.get_lobbys() #TODO
+            data = network.get_lobbys()
 
             if len(data) != 0: # Prevent rendering empty data
                 self.lobbys_list.insert(END, " Open Lobbys: \n")
 
-                self.lobbys_list.insert(END, " - " + data + "\n") # TODO: Parsen der Antwort
+                self.lobbys_list.insert(END, " - " + data + "\n")
                 self.lobbys_list.insert(END, "")
         except:
             self.lobbys_list.insert(END, " No open Lobbys available ")
@@ -114,7 +114,7 @@ class L_Window(Toplevel):
 
     def create_game(self):
         try:
-            #data = network.create_lobby() #TODO
+            #data = network.create_lobby()
             extra_window = MP_Window("True") # Host hat immer X
         except:
             messagebox.showerror('Create Multiplayer Error', 'Error: Counld not create lobby')

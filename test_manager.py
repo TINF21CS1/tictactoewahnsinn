@@ -1,4 +1,4 @@
-# Important! Only for testing winning-screen & update-settings functionality!
+# Testing-Manager
 
 import numpy as np
 import json

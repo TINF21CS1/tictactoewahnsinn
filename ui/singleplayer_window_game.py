@@ -87,8 +87,6 @@ class SP_Window(Toplevel):
             self.player_X = True
         elif player_X == "False":
             self.player_X = False
-        else:   # Nur zum Testen!!!
-            self.player_X = True
 
         self.board_canvas.bind('<Button-1>', self.click)
 

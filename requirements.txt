@@ -4,3 +4,4 @@ socketio
 socketio-python
 uvicorn
 aiohttp
+numpy
