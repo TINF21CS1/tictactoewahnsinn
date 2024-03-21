@@ -56,8 +56,8 @@ class Multiplayer(ttk.Frame):
 class ChooseAiLevel(ttk.Frame):
     def __init__(self, container, frame_switcher):
         super().__init__(container)
-        easy = ttk.Button(self, text='Easy', command=lambda: frame_switcher.show_frame(Game))
-        hard = ttk.Button(self, text='Hard', command=lambda: frame_switcher.show_frame(Game))
+        easy = ttk.Button(self, text='Easy', command=lambda: [frame_switcher.show_frame(Game), frame_switcher.frames[Game].set_ai_difficulty(2)])
+        hard = ttk.Button(self, text='Hard', command=lambda: [frame_switcher.show_frame(Game), frame_switcher.frames[Game].set_ai_difficulty(9)])
         easy.pack()
         hard.pack()
 
@@ -93,17 +93,18 @@ class Game(ttk.Frame):
         self.rowconfigure(1, weight=9)
         self.columnconfigure(0, weight=3)
         self.columnconfigure(0, weight=2)
+        self.difficulty = 0
    
          # Add Board to Game page
         board_view = BoardView(self)
         board_view.grid(column=0, row=1)
         
         # MVC for Board
-        model = board.Board() 
-        view = board_view
-        opponent = ai.AI(model, 3)
-        controller = BoardController(model, view, opponent)
-        view.set_controller(controller)
+        self.model = board.Board() 
+        self.view = board_view
+        self.opponent = ai.AI(self.model, self.difficulty)
+        self.controller = BoardController(self.model, self.view, self.opponent)
+        self.view.set_controller(self.controller)
          
 
         # Add Chat to Game page
@@ -113,7 +114,12 @@ class Game(ttk.Frame):
         # Add Label to Game page
         label = ttk.Label(self, text='Player X')
         label.grid(column=0, row=0)
-
+    
+    def set_ai_difficulty(self, difficulty):
+        self.difficulty = difficulty
+        if type(self.opponent == ai.AI):
+            self.opponent.change_depth(difficulty) 
+            print(difficulty)
 
 class BoardView(ttk.Frame):
     def __init__(self, container):
@@ -148,7 +154,6 @@ class BoardView(ttk.Frame):
                     pady=5,
                     sticky="nsew"
                 )
-
 
     def pressed(self, event):
         if event.widget['state'] != tk.DISABLED:

@@ -42,6 +42,9 @@ class AI():
         self._board = board
         self._max_depth = max_depth
 
+    def change_depth(self, max_depth):
+        self._max_depth = max_depth
+
     def minimax(self, depth, is_maximizing):
         """
         Implement the Minimax algorithm for Tic-Tac-Toe.
