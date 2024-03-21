@@ -1,7 +1,10 @@
 from tkinter import *
 import numpy as np
 import json
+import random
+import time
 import test_manager as gamemanager
+#import actors.ai as ki
 
 # Global Settings
 board_size = 600
@@ -18,6 +21,13 @@ class SP_Window(Toplevel):
 
         # Check for Win, Lose & Tie
         self.gm = gamemanager.manager()
+
+        # Spielzug durch AI
+        #if difficulty == "easy":
+        #    difficulty = 0
+        #elif difficulty == "difficult":
+        #    difficulty = 9
+        self.ki = AI(difficulty)
 
         # Bildschirmgröße
         screen_width = self.winfo_screenwidth()
@@ -88,10 +98,10 @@ class SP_Window(Toplevel):
 
         # Rendern der Objekte:
         self.initialize_board()
-        self.initialize_diff("Aktueller KI-Schwierigkeitsgrad:")
+        self.initialize_diff("Current Difficulty:")
         self.initialize_stats("Stats:")
         self.initialize_version("Version: 0.1")
-        self.initialize_zug("Aktuell am Zug: ")
+        self.initialize_zug("Currently on the move: ")
 
         self.diff()
         self.stats()
@@ -135,7 +145,7 @@ class SP_Window(Toplevel):
         try:
             self.diff_list.insert(END, " KI: " + self.difficulty + "\n")
         except:
-            self.diff_list.insert(END, " Fehler: Kein Schwierigkeitsgrad verfügbar " + "\n")
+            self.diff_list.insert(END, " Error: No difficulty available " + "\n")
 
     # Functions for Zug
 
@@ -152,9 +162,9 @@ class SP_Window(Toplevel):
         
         # Only for initialization
         if self.player_X:
-            self.zug_list.insert(END, data_own["name"] + " (Ich) ")
+            self.zug_list.insert(END, data_own["name"] + " (Me) ")
         else:
-            self.zug_list.insert(END, "KI (Gegner) ")
+            self.zug_list.insert(END, "KI (Enemy) ")
 
     # Function for stats
     
@@ -166,14 +176,14 @@ class SP_Window(Toplevel):
         
         # Own stats
         if len(data) != 0: # Prevent rendering empty data
-            self.stats_list.insert(END, " Eigene Statistiken (" + data["name"] + "): \n")
+            self.stats_list.insert(END, " Own Statistics (" + data["name"] + "): \n")
 
-            self.stats_list.insert(END, " - Siege: " + data["wins"] + "\n")
-            self.stats_list.insert(END, " - Unentschieden: " + data["draws"] + "\n")
-            self.stats_list.insert(END, " - Niederlage: " + data["losses"] + "\n")
+            self.stats_list.insert(END, " - Wins: " + data["wins"] + "\n")
+            self.stats_list.insert(END, " - Ties: " + data["draws"] + "\n")
+            self.stats_list.insert(END, " - Losses: " + data["losses"] + "\n")
             self.stats_list.insert(END, "")
         else:
-            self.stats_list.insert(END, " Fehler beim Laden der eigenen Statistiken")
+            self.stats_list.insert(END, " Error while loading local statistics")
             self.stats_list.insert(END, "")
 
         self.after(500, self.stats) # Update every half second
@@ -210,51 +220,40 @@ class SP_Window(Toplevel):
             data = json.load(f)
 
         if winner == "X":
-            text = f'{data["name"]} gewinnt (X)'
+            text = f'{data["name"]} wins (X)'
             color = symbol_X_color
         elif winner == "O":
-            text = 'KI gewinnt (O)'
+            text = 'KI wins (O)'
             color = symbol_O_color
         else:
-            text = 'Unentschieden'
+            text = 'Tie'
             color = 'gray'
 
         self.board_canvas.delete("all")
         self.board_canvas.create_text(board_size / 2, board_size / 3, font="cmr 30 bold", fill=color, text=text)
 
-    def click(self, event):
-        grid_position = [event.x, event.y]
-        logical_position = self.grid_to_logical(grid_position)
-
-        if self.player_X and not self.is_grid_occupied(logical_position):
-                self.draw_X(logical_position)
-                self.board_status[logical_position[0]][logical_position[1]] = -1
-                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie TODO
-                self.player_X = False # Stetigen Wechsel
-
-                print("Player X: " + str(self.board_status))
-                print("Sende Board an O...") # Senden: Board
+    def ai_move(self):
+        logical_position = self.ki.spielzug(self.board_status)
+        if not self.is_grid_occupied(logical_position):
+            self.draw_O(logical_position)
+            self.board_status[logical_position[0]][logical_position[1]] = 1
+            
+            check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie
+            self.player_X = True # Stetigen Wechsel
+            self.check(check)
+            print("Player O: " + str(self.board_status))
         else:
-            if not self.is_grid_occupied(logical_position):
-                self.draw_O(logical_position)
-                self.board_status[logical_position[0]][logical_position[1]] = 1
-                #aimove = self.gm.ai_move(self.board_status, self.difficulty) # Get next AI-Move TODO: Rendern
-                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie TODO
-                self.player_X = True # Stetigen Wechsel
+            self.ai_move() # Retry
 
-                print("Player O: " + str(self.board_status))
-                print("Sende Board an X...") # Senden: Board
-        
+    def check(self, check):
         # Check for Win, Lose & Tie
         if check == "X":
             self.display_gameover("X")
-            self.gm.update_stats("X") #wird durch User-Klasse gehandelt TODO
         elif check == "O":
             self.display_gameover("O")
-            self.gm.update_stats("O") #wird durch User-Klasse gehandelt
         elif check == "Tie":
             self.display_gameover("Tie")
-            self.gm.update_stats("Tie") #wird durch User-Klasse gehandelt
+        # Aktualisieren der Stats wird durch User-Klasse gehandelt
             
         # Zug
         with open("own_stats_example.json","r") as f:
@@ -263,7 +262,41 @@ class SP_Window(Toplevel):
         if not (check == "X" or check == "O" or check == "Tie"):
             if self.player_X:
                 self.zug_list.delete(0,END)  # Clears Listbox
-                self.zug_list.insert(END, data_own["name"] + " (Ich) ")
+                self.zug_list.insert(END, data_own["name"] + " (Me) ")
             else:
                 self.zug_list.delete(0,END)  # Clears Listbox
-                self.zug_list.insert(END, "KI (Gegner) ")
+                self.zug_list.insert(END, "KI (Enemy) ")
+    
+    def click(self, event):
+        grid_position = [event.x, event.y]
+        logical_position = self.grid_to_logical(grid_position)
+
+        if self.player_X and not self.is_grid_occupied(logical_position):
+                self.draw_X(logical_position)
+                self.board_status[logical_position[0]][logical_position[1]] = -1
+                check = self.gm.checkboard(self.board_status, self.player_X) # Check for Win, Lose & Tie durch GM
+                self.player_X = False # Stetigen Wechsel
+
+                self.check(check)
+                print("Player X: " + str(self.board_status))
+
+        if not (check == "X" or check == "O" or check == "Tie"): # Solange Game nicht beendet
+            self.ai_move()
+
+class AI():
+    def __init__(self, diff):
+        self.diff = diff
+
+    def spielzug(self, board_status):
+        print(board_status)
+
+        if self.diff == "easy" or "difficult": # Schwere KI muss noch implementiert werden
+            arr = self.leichter_spielzug()
+            return arr
+            
+    def leichter_spielzug(self):
+
+        zeile = random.randint(0, 2)
+        spalte = random.randint(0, 2)
+
+        return [zeile, spalte]
