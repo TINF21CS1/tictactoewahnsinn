@@ -1,3 +1,6 @@
+# To Start the Application
+Install the requirements listed in ```requiremenets.txt```. To launch the application use ```python3 main_window.py```.
+
 ## Network Communication Framework (Tim)
 
 The networking module uses `asyncio` and `socketio` for WebSocket communication, ensuring efficient and non-blocking exchanges. It supports server discovery through UDP packets, provides event handling, and allows for the creation and management of game-specific communication packets. Additionally, it enables external use of event listeners and triggers, and includes `send_data` functions for interfacing with other components.
