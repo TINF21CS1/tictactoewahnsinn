@@ -109,13 +109,13 @@ class S_Window(Toplevel):
         self.minsize(900, 700)
 
         # Rendern der Objekte:
-        self.initialize_current_settings("Aktuelle Einstellungen:")
+        self.initialize_current_settings("Current Setting:")
         self.initialize_id("ID: ")
         self.initialize_name("Name: ")
         self.initialize_street("Strasse: ")
         self.initialize_plz("PLZ: ")
         self.initialize_country("Land: ")
-        self.initialize_settings("Einstellungen ändern:")
+        self.initialize_settings("Change settings:")
 
         self.settings()
         self.id()
@@ -221,7 +221,7 @@ class S_Window(Toplevel):
         if len(data) != 0: # Prevent rendering empty data
             self.text_frame.insert(END, data)
         else:
-            self.text_frame.insert(END, " Fehler beim Laden der Einstellungen")
+            self.text_frame.insert(END, " Error while loading the settings")
             self.text_frame.insert(END, "")
 
     # Save the changed settings

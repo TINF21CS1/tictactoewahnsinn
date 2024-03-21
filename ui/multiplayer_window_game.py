@@ -85,7 +85,7 @@ class MP_Window(Toplevel):
         self.initialize_chat("Chat:")
         self.initialize_stats("Stats:")
         self.initialize_version("Version: 0.1")
-        self.initialize_zug("Aktuell am Zug: ")
+        self.initialize_zug("Currently on the move: ")
         
         self.chat()
         self.stats()
@@ -183,9 +183,9 @@ class MP_Window(Toplevel):
         
         # Only for initialization
         if self.player_X:
-            self.zug_list.insert(END, data_own["name"] + " (Ich) ")
+            self.zug_list.insert(END, data_own["name"] + " (Me) ")
         else:
-            self.zug_list.insert(END, data_enemy["name"] + " (Gegner) ")
+            self.zug_list.insert(END, data_enemy["name"] + " (Enemy) ")
 
     # Function for stats
     
@@ -197,14 +197,14 @@ class MP_Window(Toplevel):
         
         # Own stats
         if len(data) != 0: # Prevent rendering empty data
-            self.stats_list.insert(END, " Eigene Statistiken (" + data["name"] + "): \n")
+            self.stats_list.insert(END, " Own Statistics (" + data["name"] + "): \n")
 
-            self.stats_list.insert(END, " - Siege: " + data["wins"] + "\n")
-            self.stats_list.insert(END, " - Unentschieden: " + data["draws"] + "\n")
-            self.stats_list.insert(END, " - Niederlage: " + data["losses"] + "\n")
+            self.stats_list.insert(END, " - Wins: " + data["wins"] + "\n")
+            self.stats_list.insert(END, " - Ties: " + data["draws"] + "\n")
+            self.stats_list.insert(END, " - Losses: " + data["losses"] + "\n")
             self.stats_list.insert(END, "")
         else:
-            self.stats_list.insert(END, " Fehler beim Laden der eigenen Statistiken")
+            self.stats_list.insert(END, " Error while loading local statistics")
             self.stats_list.insert(END, "")
 
         with open("enemy_stats_example.json","r") as f:
@@ -212,14 +212,14 @@ class MP_Window(Toplevel):
 
         # Enemy stats
         if len(data) != 0: # Prevent rendering empty data
-            self.stats_list.insert(END, " Eigene Statistiken (" + data["name"] + "): \n")
+            self.stats_list.insert(END, " Own Statistics (" + data["name"] + "): \n")
 
-            self.stats_list.insert(END, " - Siege: " + data["wins"] + "\n")
-            self.stats_list.insert(END, " - Unentschieden: " + data["draws"] + "\n")
-            self.stats_list.insert(END, " - Niederlage: " + data["losses"] + "\n")
+            self.stats_list.insert(END, " - Wins: " + data["wins"] + "\n")
+            self.stats_list.insert(END, " - Ties: " + data["draws"] + "\n")
+            self.stats_list.insert(END, " - Losses: " + data["losses"] + "\n")
             self.stats_list.insert(END, "")
         else:
-            self.stats_list.insert(END, " Fehler beim Laden der gegnerischen Statistiken")
+            self.stats_list.insert(END, " Error while loading local statistics")
             self.stats_list.insert(END, "")
 
         self.after(500, self.stats) # Update every half second
@@ -259,13 +259,13 @@ class MP_Window(Toplevel):
             data_enemy = json.load(g)
 
         if winner == "X":
-            text = f'{data["name"]} gewinnt (X)'
+            text = f'{data["name"]} wins (X)'
             color = symbol_X_color
         elif winner == "O":
-            text = f'{data_enemy["name"]} gewinnt (O)'
+            text = f'{data_enemy["name"]} wins (O)'
             color = symbol_O_color
         else:
-            text = 'Unentschieden'
+            text = 'Tie'
             color = 'gray'
 
         self.board_canvas.delete("all")

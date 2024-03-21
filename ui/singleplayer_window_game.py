@@ -246,14 +246,22 @@ class SP_Window(Toplevel):
             self.ai_move() # Retry
 
     def check(self, check):
+
+        with open('own_stats_example.json', 'r') as file:
+            data = json.load(file)
+
         # Check for Win, Lose & Tie
         if check == "X":
             self.display_gameover("X")
+            self.gm.update_stats("X") #wird durch User-Klasse gehandelt
         elif check == "O":
             self.display_gameover("O")
+            self.gm.update_stats("O") #wird durch User-Klasse gehandelt
         elif check == "Tie":
             self.display_gameover("Tie")
-        # Aktualisieren der Stats wird durch User-Klasse gehandelt
+            self.gm.update_stats("Tie") #wird durch User-Klasse gehandelt
+
+        # Aktualisieren der Stats würde eigentlich durch User-Klasse gehandelt werden
             
         # Zug
         with open("own_stats_example.json","r") as f:

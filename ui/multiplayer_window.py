@@ -90,12 +90,12 @@ class L_Window(Toplevel):
             data = network.get_lobbys() #TODO
 
             if len(data) != 0: # Prevent rendering empty data
-                self.lobbys_list.insert(END, " Offene Lobbys: \n")
+                self.lobbys_list.insert(END, " Open Lobbys: \n")
 
                 self.lobbys_list.insert(END, " - " + data + "\n") # TODO: Parsen der Antwort
                 self.lobbys_list.insert(END, "")
         except:
-            self.lobbys_list.insert(END, " Keine offenen Lobbys vohanden ")
+            self.lobbys_list.insert(END, " No open Lobbys available ")
             self.lobbys_list.insert(END, "")
 
         self.after(500, self.lobbys) # Update every half second
@@ -117,4 +117,4 @@ class L_Window(Toplevel):
             #data = network.create_lobby() #TODO
             extra_window = MP_Window("True") # Host hat immer X
         except:
-            messagebox.showerror('Create Multiplayer Error', 'Fehler: Es konnte keine Lobby erstellt werden')
+            messagebox.showerror('Create Multiplayer Error', 'Error: Counld not create lobby')
